@@ -50,7 +50,13 @@ export async function getTransactions(
       orderBy: { date: "desc" },
     });
 
-    return { success: true, data: transactions };
+    // Convert Decimal to number for client component
+    const convertedTransactions = transactions.map((t) => ({
+      ...t,
+      amount: Number(t.amount),
+    }));
+
+    return { success: true, data: convertedTransactions };
   } catch (error) {
     console.error("[v0] Error getting transactions:", error);
     return { success: false, error: "Gagal mengambil data transaksi" };
@@ -88,8 +94,9 @@ export async function getTransactionSummary(
       },
     });
 
-    const totalPemasukan = pemasukan._sum.amount || 0;
-    const totalPengeluaran = pengeluaran._sum.amount || 0;
+    // Convert Decimal to number for client component
+    const totalPemasukan = Number(pemasukan._sum.amount || 0);
+    const totalPengeluaran = Number(pengeluaran._sum.amount || 0);
     const balance = totalPemasukan - totalPengeluaran;
 
     return {
@@ -128,10 +135,16 @@ export async function createTransaction(
       },
     });
 
+    // Convert Decimal to number for client component
+    const convertedTransaction = {
+      ...transaction,
+      amount: Number(transaction.amount),
+    };
+
     revalidatePath("/laporan");
     revalidatePath("/admin/laporan");
 
-    return { success: true, data: transaction };
+    return { success: true, data: convertedTransaction };
   } catch (error) {
     console.error("[v0] Error creating transaction:", error);
     if (error instanceof z.ZodError) {
@@ -149,10 +162,16 @@ export async function deleteTransaction(id: string) {
       where: { id },
     });
 
+    // Convert Decimal to number for client component
+    const convertedTransaction = {
+      ...transaction,
+      amount: Number(transaction.amount),
+    };
+
     revalidatePath("/laporan");
     revalidatePath("/admin/laporan");
 
-    return { success: true, data: transaction };
+    return { success: true, data: convertedTransaction };
   } catch (error) {
     console.error("[v0] Error deleting transaction:", error);
     return { success: false, error: "Gagal menghapus transaksi" };

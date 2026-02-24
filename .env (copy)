@@ -1,9 +1,0 @@
-# Database (Prisma/PostgreSQL)
-DATABASE_URL="postgresql://postgres:2436@localhost:5432/web_rt55?schema=public"
-
-# Next Auth
-NEXTAUTH_URL="http://localhost:3000"
-NEXTAUTH_SECRET="d24cc4fd4f1c38cc7a3c60121d4e39a173da60cf0902a6b"
-
-# Public Env (Bisa diakses di Client/Browser)
-NEXT_PUBLIC_API_URL="http://localhost:3000/api"
