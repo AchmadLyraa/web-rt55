@@ -1,0 +1,86 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  WARGA
+}
+
+enum TransactionType {
+  PEMASUKAN
+  PENGELUARAN
+}
+
+model User {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  password  String
+  role      Role     @default(WARGA)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  galleries      Gallery[]
+  announcements  Announcement[]
+  transactions   CashTransaction[]
+}
+
+model Homepage {
+  id        String   @id @default(cuid())
+  rtName    String
+  sambutan  String   @db.Text
+  visi      String   @db.Text
+  misi      String   @db.Text
+  bannerUrl String?
+  updatedAt DateTime @updatedAt
+}
+
+model Gallery {
+  id          String   @id @default(cuid())
+  title       String
+  description String?  @db.Text
+  imageUrl    String
+  createdById String
+  createdBy   User     @relation(fields: [createdById], references: [id], onDelete: Restrict)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([createdAt])
+}
+
+model Announcement {
+  id          String   @id @default(cuid())
+  title       String
+  content     String   @db.Text
+  attachment  String?
+  createdById String
+  createdBy   User     @relation(fields: [createdById], references: [id], onDelete: Restrict)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([createdAt])
+}
+
+model CashTransaction {
+  id          String           @id @default(cuid())
+  type        TransactionType
+  title       String
+  description String?          @db.Text
+  amount      Decimal          @db.Decimal(15, 2)
+  date        DateTime
+  createdById String
+  createdBy   User             @relation(fields: [createdById], references: [id], onDelete: Restrict)
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  @@index([type, date])
+}
