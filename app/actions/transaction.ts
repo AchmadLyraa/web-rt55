@@ -1,7 +1,7 @@
 "use server";
 
-import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
+import { requireAdmin } from "@/lib/auth";
 import { z } from "zod";
 import { revalidatePath } from "next/cache";
 
@@ -110,18 +110,13 @@ export async function createTransaction(
   data: z.infer<typeof transactionSchema>
 ) {
   try {
-    const session = await auth();
-
-    if (!session || session.user.role !== "ADMIN") {
-      return { success: false, error: "Unauthorized" };
-    }
-
+    const session = await requireAdmin();
     const validated = transactionSchema.parse(data);
 
     const transaction = await prisma.cashTransaction.create({
       data: {
         ...validated,
-        createdById: session.user.id,
+        createdById: session.user.id!,
       },
       include: {
         createdBy: {
@@ -148,11 +143,7 @@ export async function createTransaction(
 
 export async function deleteTransaction(id: string) {
   try {
-    const session = await auth();
-
-    if (!session || session.user.role !== "ADMIN") {
-      return { success: false, error: "Unauthorized" };
-    }
+    await requireAdmin();
 
     const transaction = await prisma.cashTransaction.delete({
       where: { id },
@@ -167,3 +158,4 @@ export async function deleteTransaction(id: string) {
     return { success: false, error: "Gagal menghapus transaksi" };
   }
 }
+

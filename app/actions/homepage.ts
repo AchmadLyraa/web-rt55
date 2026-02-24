@@ -1,7 +1,7 @@
 "use server";
 
-import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
+import { requireAdmin } from "@/lib/auth";
 import { z } from "zod";
 import { revalidatePath } from "next/cache";
 
@@ -27,12 +27,7 @@ export async function getHomepage() {
 
 export async function updateHomepage(data: z.infer<typeof homepageSchema>) {
   try {
-    const session = await auth();
-
-    if (!session || session.user.role !== "ADMIN") {
-      return { success: false, error: "Unauthorized" };
-    }
-
+    await requireAdmin();
     const validated = homepageSchema.parse(data);
 
     const homepage = await prisma.homepage.upsert({
@@ -56,3 +51,4 @@ export async function updateHomepage(data: z.infer<typeof homepageSchema>) {
     return { success: false, error: "Gagal mengupdate homepage" };
   }
 }
+

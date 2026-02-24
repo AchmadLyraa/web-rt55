@@ -73,3 +73,4 @@ export const authConfig = {
     signIn: "/login",
   },
 } satisfies NextAuthConfig;
+

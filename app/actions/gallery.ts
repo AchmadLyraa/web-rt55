@@ -1,7 +1,7 @@
 "use server";
 
-import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
+import { requireAdmin } from "@/lib/auth";
 import { z } from "zod";
 import { revalidatePath } from "next/cache";
 
@@ -54,18 +54,13 @@ export async function getGalleryById(id: string) {
 
 export async function createGallery(data: z.infer<typeof gallerySchema>) {
   try {
-    const session = await auth();
-
-    if (!session || session.user.role !== "ADMIN") {
-      return { success: false, error: "Unauthorized" };
-    }
-
+    const session = await requireAdmin();
     const validated = gallerySchema.parse(data);
 
     const gallery = await prisma.gallery.create({
       data: {
         ...validated,
-        createdById: session.user.id,
+        createdById: session.user.id!,
       },
       include: {
         createdBy: {
@@ -92,11 +87,7 @@ export async function createGallery(data: z.infer<typeof gallerySchema>) {
 
 export async function deleteGallery(id: string) {
   try {
-    const session = await auth();
-
-    if (!session || session.user.role !== "ADMIN") {
-      return { success: false, error: "Unauthorized" };
-    }
+    await requireAdmin();
 
     const gallery = await prisma.gallery.delete({
       where: { id },
@@ -111,3 +102,4 @@ export async function deleteGallery(id: string) {
     return { success: false, error: "Gagal menghapus galeri" };
   }
 }
+

@@ -1,7 +1,7 @@
 "use server";
 
-import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
+import { requireAdmin } from "@/lib/auth";
 import { z } from "zod";
 import { revalidatePath } from "next/cache";
 
@@ -56,18 +56,13 @@ export async function createAnnouncement(
   data: z.infer<typeof announcementSchema>
 ) {
   try {
-    const session = await auth();
-
-    if (!session || session.user.role !== "ADMIN") {
-      return { success: false, error: "Unauthorized" };
-    }
-
+    const session = await requireAdmin();
     const validated = announcementSchema.parse(data);
 
     const announcement = await prisma.announcement.create({
       data: {
         ...validated,
-        createdById: session.user.id,
+        createdById: session.user.id!,
       },
       include: {
         createdBy: {
@@ -97,12 +92,7 @@ export async function updateAnnouncement(
   data: z.infer<typeof announcementSchema>
 ) {
   try {
-    const session = await auth();
-
-    if (!session || session.user.role !== "ADMIN") {
-      return { success: false, error: "Unauthorized" };
-    }
-
+    await requireAdmin();
     const validated = announcementSchema.parse(data);
 
     const announcement = await prisma.announcement.update({
@@ -133,11 +123,7 @@ export async function updateAnnouncement(
 
 export async function deleteAnnouncement(id: string) {
   try {
-    const session = await auth();
-
-    if (!session || session.user.role !== "ADMIN") {
-      return { success: false, error: "Unauthorized" };
-    }
+    await requireAdmin();
 
     const announcement = await prisma.announcement.delete({
       where: { id },
@@ -152,3 +138,4 @@ export async function deleteAnnouncement(id: string) {
     return { success: false, error: "Gagal menghapus pengumuman" };
   }
 }
+
