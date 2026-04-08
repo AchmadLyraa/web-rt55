@@ -35,13 +35,16 @@ model User {
 }
 
 model Homepage {
-  id        String   @id @default(cuid())
-  rtName    String
-  sambutan  String   @db.Text
-  visi      String   @db.Text
-  misi      String   @db.Text
-  bannerUrl String?
-  updatedAt DateTime @updatedAt
+  id                String   @id @default(cuid())
+  rtName            String
+  sambutan          String   @db.Text
+  visi              String   @db.Text
+  misi              String   @db.Text
+  heroImageUrl      String?  // Full-width hero image di landing page
+  bannerUrl         String?  // Legacy banner (opsional)
+  ketuaRtName       String?  // Nama ketua RT untuk section visi/misi
+  ketuaRtPhotoUrl   String?  // Foto ketua RT
+  updatedAt         DateTime @updatedAt
 }
 
 model Gallery {
@@ -84,4 +87,3 @@ model CashTransaction {
 
   @@index([type, date])
 }
-

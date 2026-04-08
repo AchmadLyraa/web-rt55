@@ -11,6 +11,9 @@ const homepageSchema = z.object({
   visi: z.string().min(1, "Visi wajib diisi"),
   misi: z.string().min(1, "Misi wajib diisi"),
   bannerUrl: z.string().optional(),
+  heroImageUrl: z.string().optional(),
+  ketuaRtName: z.string().optional(),
+  ketuaRtPhotoUrl: z.string().optional(),
 });
 
 export async function getHomepage() {
@@ -51,4 +54,3 @@ export async function updateHomepage(data: z.infer<typeof homepageSchema>) {
     return { success: false, error: "Gagal mengupdate homepage" };
   }
 }
-

@@ -13,7 +13,7 @@ async function main() {
 
   // Create default admin user
   const hashedPassword = await bcrypt.hash("admin123", 10);
-  
+
   const admin = await prisma.user.upsert({
     where: { email: "admin@rt.local" },
     update: {},
@@ -34,10 +34,14 @@ async function main() {
     create: {
       id: "default",
       rtName: "RT 55",
-      sambutan: "Selamat datang di website resmi RT 55. Website ini dibuat untuk memudahkan komunikasi dan berbagi informasi antar warga.",
+      sambutan:
+        "Selamat datang di website resmi RT 55. Website ini dibuat untuk memudahkan komunikasi dan berbagi informasi antar warga.",
       visi: "Menjadi komunitas RT yang solid, transparan, dan sejahtera",
       misi: "Membangun komunikasi yang baik, transparansi dalam keuangan, dan kepedulian antar warga",
       bannerUrl: null,
+      heroImageUrl: null, // Akan diupload melalui admin panel
+      ketuaRtName: "Budi Santoso",
+      ketuaRtPhotoUrl: null, // Akan diupload melalui admin panel
     },
   });
 
@@ -53,4 +57,3 @@ main()
   .finally(async () => {
     await prisma.$disconnect();
   });
-

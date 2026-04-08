@@ -1,9 +1,9 @@
-import { getAnnouncementById } from '@/app/actions/announcement';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { format } from 'date-fns';
-import { id } from 'date-fns/locale';
-import Link from 'next/link';
-import { Button } from '@/components/ui/button';
+import { getAnnouncementById } from "@/app/actions/announcement";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { format } from "date-fns";
+import { id as idLocale } from "date-fns/locale";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
 export default async function AnnouncementDetailPage({
   params,
@@ -40,7 +40,10 @@ export default async function AnnouncementDetailPage({
         <CardHeader>
           <CardTitle className="text-3xl">{announcement.title}</CardTitle>
           <p className="text-sm text-muted-foreground mt-2">
-            {format(new Date(announcement.createdAt), 'd MMMM yyyy HH:mm', { locale: id })} • {announcement.createdBy.name}
+            {format(new Date(announcement.createdAt), "d MMMM yyyy HH:mm", {
+              locale: idLocale,
+            })}{" "}
+            • {announcement.createdBy.name}
           </p>
         </CardHeader>
         <CardContent className="space-y-4">

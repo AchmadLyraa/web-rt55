@@ -1,12 +1,12 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { getHomepage, updateHomepage } from '@/app/actions/homepage';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Textarea } from '@/components/ui/textarea';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect } from "react";
+import { getHomepage, updateHomepage } from "@/app/actions/homepage";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Textarea } from "@/components/ui/textarea";
+import { useRouter } from "next/navigation";
 
 export default function AdminHomepagePage() {
   const router = useRouter();
@@ -17,11 +17,14 @@ export default function AdminHomepagePage() {
   const [uploadProgress, setUploadProgress] = useState(0);
 
   const [formData, setFormData] = useState({
-    rtName: '',
-    sambutan: '',
-    visi: '',
-    misi: '',
-    bannerUrl: '',
+    rtName: "",
+    sambutan: "",
+    visi: "",
+    misi: "",
+    bannerUrl: "",
+    heroImageUrl: "",
+    ketuaRtName: "",
+    ketuaRtPhotoUrl: "",
   });
 
   useEffect(() => {
@@ -34,11 +37,14 @@ export default function AdminHomepagePage() {
             sambutan: result.data.sambutan,
             visi: result.data.visi,
             misi: result.data.misi,
-            bannerUrl: result.data.bannerUrl || '',
+            bannerUrl: result.data.bannerUrl || "",
+            heroImageUrl: result.data.heroImageUrl || "",
+            ketuaRtName: result.data.ketuaRtName || "",
+            ketuaRtPhotoUrl: result.data.ketuaRtPhotoUrl || "",
           });
         }
       } catch (err) {
-        console.error('[v0] Error loading homepage:', err);
+        console.error("[v0] Error loading homepage:", err);
       } finally {
         setIsLoading(false);
       }
@@ -47,32 +53,35 @@ export default function AdminHomepagePage() {
     loadData();
   }, []);
 
-  async function handleUploadBanner(file: File) {
+  async function handleUploadFile(
+    file: File,
+    fieldName: "bannerUrl" | "heroImageUrl" | "ketuaRtPhotoUrl",
+  ) {
     try {
       setUploadProgress(0);
       const formDataObj = new FormData();
-      formDataObj.append('file', file);
-      formDataObj.append('category', 'homepage');
+      formDataObj.append("file", file);
+      formDataObj.append("category", "homepage");
 
-      console.log('[v0] Uploading banner:', file.name);
+      console.log("[v0] Uploading file:", file.name, "for field:", fieldName);
 
-      const response = await fetch('/api/upload', {
-        method: 'POST',
+      const response = await fetch("/api/upload", {
+        method: "POST",
         body: formDataObj,
       });
 
       if (!response.ok) {
         const data = await response.json();
-        throw new Error(data.error || 'Upload failed');
+        throw new Error(data.error || "Upload failed");
       }
 
       const data = await response.json();
-      console.log('[v0] Upload successful:', data.fileUrl);
-      setFormData({ ...formData, bannerUrl: data.fileUrl });
+      console.log("[v0] Upload successful:", data.fileUrl);
+      setFormData({ ...formData, [fieldName]: data.fileUrl });
       setUploadProgress(100);
     } catch (err) {
-      console.error('[v0] Upload error:', err);
-      setError(err instanceof Error ? err.message : 'Upload gagal');
+      console.error("[v0] Upload error:", err);
+      setError(err instanceof Error ? err.message : "Upload gagal");
     }
   }
 
@@ -83,19 +92,19 @@ export default function AdminHomepagePage() {
     setSuccess(false);
 
     try {
-      console.log('[v0] Saving homepage');
+      console.log("[v0] Saving homepage");
       const result = await updateHomepage(formData);
 
       if (result.success) {
         setSuccess(true);
-        console.log('[v0] Homepage saved successfully');
+        console.log("[v0] Homepage saved successfully");
         setTimeout(() => setSuccess(false), 3000);
       } else {
-        setError(result.error || 'Gagal menyimpan');
+        setError(result.error || "Gagal menyimpan");
       }
     } catch (err) {
-      console.error('[v0] Error saving:', err);
-      setError('Terjadi kesalahan saat menyimpan');
+      console.error("[v0] Error saving:", err);
+      setError("Terjadi kesalahan saat menyimpan");
     } finally {
       setIsSaving(false);
     }
@@ -185,7 +194,9 @@ export default function AdminHomepagePage() {
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium">Banner</label>
+              <label className="text-sm font-medium">
+                Hero Image (Halaman Utama)
+              </label>
               <div className="space-y-2">
                 <input
                   type="file"
@@ -193,30 +204,57 @@ export default function AdminHomepagePage() {
                   onChange={(e) => {
                     const file = e.currentTarget.files?.[0];
                     if (file) {
-                      handleUploadBanner(file);
+                      handleUploadFile(file, "heroImageUrl");
                     }
                   }}
                   disabled={isSaving}
                   className="block w-full text-sm"
                 />
-                {formData.bannerUrl && (
+                {formData.heroImageUrl && (
                   <div className="text-sm text-muted-foreground">
-                    ✓ Banner sudah diupload: {formData.bannerUrl}
+                    ✓ Hero image sudah diupload: {formData.heroImageUrl}
                   </div>
                 )}
-                {uploadProgress > 0 && uploadProgress < 100 && (
-                  <div className="w-full bg-secondary rounded-full h-2">
-                    <div
-                      className="bg-primary h-2 rounded-full transition-all"
-                      style={{ width: `${uploadProgress}%` }}
-                    />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Nama Ketua RT</label>
+              <Input
+                value={formData.ketuaRtName}
+                onChange={(e) =>
+                  setFormData({ ...formData, ketuaRtName: e.target.value })
+                }
+                placeholder="Nama ketua RT..."
+                disabled={isSaving}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Foto Ketua RT</label>
+              <div className="space-y-2">
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => {
+                    const file = e.currentTarget.files?.[0];
+                    if (file) {
+                      handleUploadFile(file, "ketuaRtPhotoUrl");
+                    }
+                  }}
+                  disabled={isSaving}
+                  className="block w-full text-sm"
+                />
+                {formData.ketuaRtPhotoUrl && (
+                  <div className="text-sm text-muted-foreground">
+                    ✓ Foto ketua RT sudah diupload: {formData.ketuaRtPhotoUrl}
                   </div>
                 )}
               </div>
             </div>
 
             <Button type="submit" disabled={isSaving} className="w-full">
-              {isSaving ? 'Menyimpan...' : 'Simpan Perubahan'}
+              {isSaving ? "Menyimpan..." : "Simpan Perubahan"}
             </Button>
           </form>
         </CardContent>

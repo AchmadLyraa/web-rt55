@@ -836,7 +836,10 @@ export const HomepageScalarFieldEnum = {
   sambutan: 'sambutan',
   visi: 'visi',
   misi: 'misi',
+  heroImageUrl: 'heroImageUrl',
   bannerUrl: 'bannerUrl',
+  ketuaRtName: 'ketuaRtName',
+  ketuaRtPhotoUrl: 'ketuaRtPhotoUrl',
   updatedAt: 'updatedAt'
 } as const
 

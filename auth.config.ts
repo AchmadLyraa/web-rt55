@@ -16,7 +16,7 @@ export const authConfig = {
         const parsedCredentials = credentialsSchema.safeParse(credentials);
 
         if (!parsedCredentials.success) {
-          console.log("[v0] Invalid credentials format");
+          console.log("Invalid credentials format");
           return null;
         }
 
@@ -28,18 +28,18 @@ export const authConfig = {
           });
 
           if (!user) {
-            console.log("[v0] User not found:", email);
+            console.log("User not found:", email);
             return null;
           }
 
           const isPasswordValid = await bcrypt.compare(password, user.password);
 
           if (!isPasswordValid) {
-            console.log("[v0] Invalid password for user:", email);
+            console.log("Invalid password for user:", email);
             return null;
           }
 
-          console.log("[v0] User authenticated:", email);
+          console.log("User authenticated:", email);
           return {
             id: user.id,
             name: user.name,
@@ -47,7 +47,7 @@ export const authConfig = {
             role: user.role,
           };
         } catch (error) {
-          console.error("[v0] Auth error:", error);
+          console.error("Auth error:", error);
           return null;
         }
       },
@@ -72,5 +72,11 @@ export const authConfig = {
   pages: {
     signIn: "/login",
   },
+  session: {
+    strategy: "jwt",
+    maxAge: 8 * 60 * 60, // 8 jam kerja
+    updateAge: 60 * 60, // Update token tiap 1 jam
+  },
+  secret: process.env.NEXTAUTH_SECRET,
+  trustHost: true, // Trust custom domains in production
 } satisfies NextAuthConfig;
-

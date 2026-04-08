@@ -1,6 +1,3 @@
-# v0 runtime files
-
-
 # Common ignores
 node_modules/
 .next/

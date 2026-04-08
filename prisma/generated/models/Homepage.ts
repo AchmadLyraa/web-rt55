@@ -30,7 +30,10 @@ export type HomepageMinAggregateOutputType = {
   sambutan: string | null
   visi: string | null
   misi: string | null
+  heroImageUrl: string | null
   bannerUrl: string | null
+  ketuaRtName: string | null
+  ketuaRtPhotoUrl: string | null
   updatedAt: Date | null
 }
 
@@ -40,7 +43,10 @@ export type HomepageMaxAggregateOutputType = {
   sambutan: string | null
   visi: string | null
   misi: string | null
+  heroImageUrl: string | null
   bannerUrl: string | null
+  ketuaRtName: string | null
+  ketuaRtPhotoUrl: string | null
   updatedAt: Date | null
 }
 
@@ -50,7 +56,10 @@ export type HomepageCountAggregateOutputType = {
   sambutan: number
   visi: number
   misi: number
+  heroImageUrl: number
   bannerUrl: number
+  ketuaRtName: number
+  ketuaRtPhotoUrl: number
   updatedAt: number
   _all: number
 }
@@ -62,7 +71,10 @@ export type HomepageMinAggregateInputType = {
   sambutan?: true
   visi?: true
   misi?: true
+  heroImageUrl?: true
   bannerUrl?: true
+  ketuaRtName?: true
+  ketuaRtPhotoUrl?: true
   updatedAt?: true
 }
 
@@ -72,7 +84,10 @@ export type HomepageMaxAggregateInputType = {
   sambutan?: true
   visi?: true
   misi?: true
+  heroImageUrl?: true
   bannerUrl?: true
+  ketuaRtName?: true
+  ketuaRtPhotoUrl?: true
   updatedAt?: true
 }
 
@@ -82,7 +97,10 @@ export type HomepageCountAggregateInputType = {
   sambutan?: true
   visi?: true
   misi?: true
+  heroImageUrl?: true
   bannerUrl?: true
+  ketuaRtName?: true
+  ketuaRtPhotoUrl?: true
   updatedAt?: true
   _all?: true
 }
@@ -165,7 +183,10 @@ export type HomepageGroupByOutputType = {
   sambutan: string
   visi: string
   misi: string
+  heroImageUrl: string | null
   bannerUrl: string | null
+  ketuaRtName: string | null
+  ketuaRtPhotoUrl: string | null
   updatedAt: Date
   _count: HomepageCountAggregateOutputType | null
   _min: HomepageMinAggregateOutputType | null
@@ -196,7 +217,10 @@ export type HomepageWhereInput = {
   sambutan?: Prisma.StringFilter<"Homepage"> | string
   visi?: Prisma.StringFilter<"Homepage"> | string
   misi?: Prisma.StringFilter<"Homepage"> | string
+  heroImageUrl?: Prisma.StringNullableFilter<"Homepage"> | string | null
   bannerUrl?: Prisma.StringNullableFilter<"Homepage"> | string | null
+  ketuaRtName?: Prisma.StringNullableFilter<"Homepage"> | string | null
+  ketuaRtPhotoUrl?: Prisma.StringNullableFilter<"Homepage"> | string | null
   updatedAt?: Prisma.DateTimeFilter<"Homepage"> | Date | string
 }
 
@@ -206,7 +230,10 @@ export type HomepageOrderByWithRelationInput = {
   sambutan?: Prisma.SortOrder
   visi?: Prisma.SortOrder
   misi?: Prisma.SortOrder
+  heroImageUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   bannerUrl?: Prisma.SortOrderInput | Prisma.SortOrder
+  ketuaRtName?: Prisma.SortOrderInput | Prisma.SortOrder
+  ketuaRtPhotoUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
 
@@ -219,7 +246,10 @@ export type HomepageWhereUniqueInput = Prisma.AtLeast<{
   sambutan?: Prisma.StringFilter<"Homepage"> | string
   visi?: Prisma.StringFilter<"Homepage"> | string
   misi?: Prisma.StringFilter<"Homepage"> | string
+  heroImageUrl?: Prisma.StringNullableFilter<"Homepage"> | string | null
   bannerUrl?: Prisma.StringNullableFilter<"Homepage"> | string | null
+  ketuaRtName?: Prisma.StringNullableFilter<"Homepage"> | string | null
+  ketuaRtPhotoUrl?: Prisma.StringNullableFilter<"Homepage"> | string | null
   updatedAt?: Prisma.DateTimeFilter<"Homepage"> | Date | string
 }, "id">
 
@@ -229,7 +259,10 @@ export type HomepageOrderByWithAggregationInput = {
   sambutan?: Prisma.SortOrder
   visi?: Prisma.SortOrder
   misi?: Prisma.SortOrder
+  heroImageUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   bannerUrl?: Prisma.SortOrderInput | Prisma.SortOrder
+  ketuaRtName?: Prisma.SortOrderInput | Prisma.SortOrder
+  ketuaRtPhotoUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.HomepageCountOrderByAggregateInput
   _max?: Prisma.HomepageMaxOrderByAggregateInput
@@ -245,7 +278,10 @@ export type HomepageScalarWhereWithAggregatesInput = {
   sambutan?: Prisma.StringWithAggregatesFilter<"Homepage"> | string
   visi?: Prisma.StringWithAggregatesFilter<"Homepage"> | string
   misi?: Prisma.StringWithAggregatesFilter<"Homepage"> | string
+  heroImageUrl?: Prisma.StringNullableWithAggregatesFilter<"Homepage"> | string | null
   bannerUrl?: Prisma.StringNullableWithAggregatesFilter<"Homepage"> | string | null
+  ketuaRtName?: Prisma.StringNullableWithAggregatesFilter<"Homepage"> | string | null
+  ketuaRtPhotoUrl?: Prisma.StringNullableWithAggregatesFilter<"Homepage"> | string | null
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Homepage"> | Date | string
 }
 
@@ -255,7 +291,10 @@ export type HomepageCreateInput = {
   sambutan: string
   visi: string
   misi: string
+  heroImageUrl?: string | null
   bannerUrl?: string | null
+  ketuaRtName?: string | null
+  ketuaRtPhotoUrl?: string | null
   updatedAt?: Date | string
 }
 
@@ -265,7 +304,10 @@ export type HomepageUncheckedCreateInput = {
   sambutan: string
   visi: string
   misi: string
+  heroImageUrl?: string | null
   bannerUrl?: string | null
+  ketuaRtName?: string | null
+  ketuaRtPhotoUrl?: string | null
   updatedAt?: Date | string
 }
 
@@ -275,7 +317,10 @@ export type HomepageUpdateInput = {
   sambutan?: Prisma.StringFieldUpdateOperationsInput | string
   visi?: Prisma.StringFieldUpdateOperationsInput | string
   misi?: Prisma.StringFieldUpdateOperationsInput | string
+  heroImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   bannerUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ketuaRtName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ketuaRtPhotoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -285,7 +330,10 @@ export type HomepageUncheckedUpdateInput = {
   sambutan?: Prisma.StringFieldUpdateOperationsInput | string
   visi?: Prisma.StringFieldUpdateOperationsInput | string
   misi?: Prisma.StringFieldUpdateOperationsInput | string
+  heroImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   bannerUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ketuaRtName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ketuaRtPhotoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -295,7 +343,10 @@ export type HomepageCreateManyInput = {
   sambutan: string
   visi: string
   misi: string
+  heroImageUrl?: string | null
   bannerUrl?: string | null
+  ketuaRtName?: string | null
+  ketuaRtPhotoUrl?: string | null
   updatedAt?: Date | string
 }
 
@@ -305,7 +356,10 @@ export type HomepageUpdateManyMutationInput = {
   sambutan?: Prisma.StringFieldUpdateOperationsInput | string
   visi?: Prisma.StringFieldUpdateOperationsInput | string
   misi?: Prisma.StringFieldUpdateOperationsInput | string
+  heroImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   bannerUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ketuaRtName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ketuaRtPhotoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -315,7 +369,10 @@ export type HomepageUncheckedUpdateManyInput = {
   sambutan?: Prisma.StringFieldUpdateOperationsInput | string
   visi?: Prisma.StringFieldUpdateOperationsInput | string
   misi?: Prisma.StringFieldUpdateOperationsInput | string
+  heroImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   bannerUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ketuaRtName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ketuaRtPhotoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -325,7 +382,10 @@ export type HomepageCountOrderByAggregateInput = {
   sambutan?: Prisma.SortOrder
   visi?: Prisma.SortOrder
   misi?: Prisma.SortOrder
+  heroImageUrl?: Prisma.SortOrder
   bannerUrl?: Prisma.SortOrder
+  ketuaRtName?: Prisma.SortOrder
+  ketuaRtPhotoUrl?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
 
@@ -335,7 +395,10 @@ export type HomepageMaxOrderByAggregateInput = {
   sambutan?: Prisma.SortOrder
   visi?: Prisma.SortOrder
   misi?: Prisma.SortOrder
+  heroImageUrl?: Prisma.SortOrder
   bannerUrl?: Prisma.SortOrder
+  ketuaRtName?: Prisma.SortOrder
+  ketuaRtPhotoUrl?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
 
@@ -345,7 +408,10 @@ export type HomepageMinOrderByAggregateInput = {
   sambutan?: Prisma.SortOrder
   visi?: Prisma.SortOrder
   misi?: Prisma.SortOrder
+  heroImageUrl?: Prisma.SortOrder
   bannerUrl?: Prisma.SortOrder
+  ketuaRtName?: Prisma.SortOrder
+  ketuaRtPhotoUrl?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
 
@@ -361,7 +427,10 @@ export type HomepageSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
   sambutan?: boolean
   visi?: boolean
   misi?: boolean
+  heroImageUrl?: boolean
   bannerUrl?: boolean
+  ketuaRtName?: boolean
+  ketuaRtPhotoUrl?: boolean
   updatedAt?: boolean
 }, ExtArgs["result"]["homepage"]>
 
@@ -371,7 +440,10 @@ export type HomepageSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exte
   sambutan?: boolean
   visi?: boolean
   misi?: boolean
+  heroImageUrl?: boolean
   bannerUrl?: boolean
+  ketuaRtName?: boolean
+  ketuaRtPhotoUrl?: boolean
   updatedAt?: boolean
 }, ExtArgs["result"]["homepage"]>
 
@@ -381,7 +453,10 @@ export type HomepageSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exte
   sambutan?: boolean
   visi?: boolean
   misi?: boolean
+  heroImageUrl?: boolean
   bannerUrl?: boolean
+  ketuaRtName?: boolean
+  ketuaRtPhotoUrl?: boolean
   updatedAt?: boolean
 }, ExtArgs["result"]["homepage"]>
 
@@ -391,11 +466,14 @@ export type HomepageSelectScalar = {
   sambutan?: boolean
   visi?: boolean
   misi?: boolean
+  heroImageUrl?: boolean
   bannerUrl?: boolean
+  ketuaRtName?: boolean
+  ketuaRtPhotoUrl?: boolean
   updatedAt?: boolean
 }
 
-export type HomepageOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "rtName" | "sambutan" | "visi" | "misi" | "bannerUrl" | "updatedAt", ExtArgs["result"]["homepage"]>
+export type HomepageOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "rtName" | "sambutan" | "visi" | "misi" | "heroImageUrl" | "bannerUrl" | "ketuaRtName" | "ketuaRtPhotoUrl" | "updatedAt", ExtArgs["result"]["homepage"]>
 
 export type $HomepagePayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Homepage"
@@ -406,7 +484,10 @@ export type $HomepagePayload<ExtArgs extends runtime.Types.Extensions.InternalAr
     sambutan: string
     visi: string
     misi: string
+    heroImageUrl: string | null
     bannerUrl: string | null
+    ketuaRtName: string | null
+    ketuaRtPhotoUrl: string | null
     updatedAt: Date
   }, ExtArgs["result"]["homepage"]>
   composites: {}
@@ -836,7 +917,10 @@ export interface HomepageFieldRefs {
   readonly sambutan: Prisma.FieldRef<"Homepage", 'String'>
   readonly visi: Prisma.FieldRef<"Homepage", 'String'>
   readonly misi: Prisma.FieldRef<"Homepage", 'String'>
+  readonly heroImageUrl: Prisma.FieldRef<"Homepage", 'String'>
   readonly bannerUrl: Prisma.FieldRef<"Homepage", 'String'>
+  readonly ketuaRtName: Prisma.FieldRef<"Homepage", 'String'>
+  readonly ketuaRtPhotoUrl: Prisma.FieldRef<"Homepage", 'String'>
   readonly updatedAt: Prisma.FieldRef<"Homepage", 'DateTime'>
 }
     
