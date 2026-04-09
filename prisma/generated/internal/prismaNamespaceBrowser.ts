@@ -55,7 +55,8 @@ export const ModelName = {
   Homepage: 'Homepage',
   Gallery: 'Gallery',
   Announcement: 'Announcement',
-  CashTransaction: 'CashTransaction'
+  CashTransaction: 'CashTransaction',
+  Household: 'Household'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -142,6 +143,21 @@ export const CashTransactionScalarFieldEnum = {
 } as const
 
 export type CashTransactionScalarFieldEnum = (typeof CashTransactionScalarFieldEnum)[keyof typeof CashTransactionScalarFieldEnum]
+
+
+export const HouseholdScalarFieldEnum = {
+  id: 'id',
+  kepalaKeluargaNama: 'kepalaKeluargaNama',
+  nomorRumah: 'nomorRumah',
+  noTelepon: 'noTelepon',
+  totalLakiLaki: 'totalLakiLaki',
+  totalPerempuan: 'totalPerempuan',
+  totalKendaraan: 'totalKendaraan',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type HouseholdScalarFieldEnum = (typeof HouseholdScalarFieldEnum)[keyof typeof HouseholdScalarFieldEnum]
 
 
 export const SortOrder = {

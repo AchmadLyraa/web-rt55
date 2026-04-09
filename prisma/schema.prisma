@@ -87,3 +87,17 @@ model CashTransaction {
 
   @@index([type, date])
 }
+
+model Household {
+  id                String   @id @default(cuid())
+  kepalaKeluargaNama String   // Nama kepala keluarga
+  nomorRumah        String?  // Nomor rumah / alamat
+  noTelepon         String?  // Nomor telepon
+  totalLakiLaki     Int      @default(0) // Total anggota laki-laki
+  totalPerempuan    Int      @default(0) // Total anggota perempuan
+  totalKendaraan    Int      @default(0) // Total kendaraan
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@index([createdAt])
+}

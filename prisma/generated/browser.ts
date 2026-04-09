@@ -42,3 +42,8 @@ export type Announcement = Prisma.AnnouncementModel
  * 
  */
 export type CashTransaction = Prisma.CashTransactionModel
+/**
+ * Model Household
+ * 
+ */
+export type Household = Prisma.HouseholdModel

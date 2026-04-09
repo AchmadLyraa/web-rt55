@@ -388,7 +388,8 @@ export const ModelName = {
   Homepage: 'Homepage',
   Gallery: 'Gallery',
   Announcement: 'Announcement',
-  CashTransaction: 'CashTransaction'
+  CashTransaction: 'CashTransaction',
+  Household: 'Household'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -404,7 +405,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "homepage" | "gallery" | "announcement" | "cashTransaction"
+    modelProps: "user" | "homepage" | "gallery" | "announcement" | "cashTransaction" | "household"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -778,6 +779,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    Household: {
+      payload: Prisma.$HouseholdPayload<ExtArgs>
+      fields: Prisma.HouseholdFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.HouseholdFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$HouseholdPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.HouseholdFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$HouseholdPayload>
+        }
+        findFirst: {
+          args: Prisma.HouseholdFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$HouseholdPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.HouseholdFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$HouseholdPayload>
+        }
+        findMany: {
+          args: Prisma.HouseholdFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$HouseholdPayload>[]
+        }
+        create: {
+          args: Prisma.HouseholdCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$HouseholdPayload>
+        }
+        createMany: {
+          args: Prisma.HouseholdCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.HouseholdCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$HouseholdPayload>[]
+        }
+        delete: {
+          args: Prisma.HouseholdDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$HouseholdPayload>
+        }
+        update: {
+          args: Prisma.HouseholdUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$HouseholdPayload>
+        }
+        deleteMany: {
+          args: Prisma.HouseholdDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.HouseholdUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.HouseholdUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$HouseholdPayload>[]
+        }
+        upsert: {
+          args: Prisma.HouseholdUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$HouseholdPayload>
+        }
+        aggregate: {
+          args: Prisma.HouseholdAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateHousehold>
+        }
+        groupBy: {
+          args: Prisma.HouseholdGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.HouseholdGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.HouseholdCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.HouseholdCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -885,6 +960,21 @@ export const CashTransactionScalarFieldEnum = {
 } as const
 
 export type CashTransactionScalarFieldEnum = (typeof CashTransactionScalarFieldEnum)[keyof typeof CashTransactionScalarFieldEnum]
+
+
+export const HouseholdScalarFieldEnum = {
+  id: 'id',
+  kepalaKeluargaNama: 'kepalaKeluargaNama',
+  nomorRumah: 'nomorRumah',
+  noTelepon: 'noTelepon',
+  totalLakiLaki: 'totalLakiLaki',
+  totalPerempuan: 'totalPerempuan',
+  totalKendaraan: 'totalKendaraan',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type HouseholdScalarFieldEnum = (typeof HouseholdScalarFieldEnum)[keyof typeof HouseholdScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -1000,6 +1090,20 @@ export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'In
 export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int[]'>
     
 
+
+/**
+ * Reference to a field of type 'Float'
+ */
+export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>
+    
+
+
+/**
+ * Reference to a field of type 'Float[]'
+ */
+export type ListFloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float[]'>
+    
+
 /**
  * Batch Payload for updateMany & deleteMany & createMany
  */
@@ -1100,6 +1204,7 @@ export type GlobalOmitConfig = {
   gallery?: Prisma.GalleryOmit
   announcement?: Prisma.AnnouncementOmit
   cashTransaction?: Prisma.CashTransactionOmit
+  household?: Prisma.HouseholdOmit
 }
 
 /* Types for Logging */

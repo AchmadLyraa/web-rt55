@@ -45,6 +45,51 @@ async function main() {
     },
   });
 
+  // Create sample household data
+  const households = await Promise.all([
+    prisma.household.upsert({
+      where: { id: "kk-001" },
+      update: {},
+      create: {
+        id: "kk-001",
+        kepalaKeluargaNama: "Budi Santoso",
+        nomorRumah: "No. 1",
+        noTelepon: "081234567890",
+        totalLakiLaki: 2,
+        totalPerempuan: 2,
+        totalKendaraan: 1,
+      },
+    }),
+    prisma.household.upsert({
+      where: { id: "kk-002" },
+      update: {},
+      create: {
+        id: "kk-002",
+        kepalaKeluargaNama: "Siti Nurhaliza",
+        nomorRumah: "No. 2",
+        noTelepon: "081234567891",
+        totalLakiLaki: 1,
+        totalPerempuan: 3,
+        totalKendaraan: 2,
+      },
+    }),
+    prisma.household.upsert({
+      where: { id: "kk-003" },
+      update: {},
+      create: {
+        id: "kk-003",
+        kepalaKeluargaNama: "Ahmad Wijaya",
+        nomorRumah: "No. 3",
+        noTelepon: "081234567892",
+        totalLakiLaki: 3,
+        totalPerempuan: 1,
+        totalKendaraan: 1,
+      },
+    }),
+  ]);
+
+  console.log("Sample households created:", households.length);
+
   console.log("Homepage created/updated:", homepage);
   console.log("Seeding completed!");
 }

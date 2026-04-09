@@ -21,7 +21,34 @@ export async function getHomepage() {
     const homepage = await prisma.homepage.findUnique({
       where: { id: "default" },
     });
-    return { success: true, data: homepage };
+    // Fetch 4 latest gallery images
+    const galleryPreview = await prisma.gallery.findMany({
+      orderBy: { createdAt: "desc" },
+      take: 4,
+      include: {
+        createdBy: {
+          select: { id: true, name: true },
+        },
+      },
+    });
+
+    // Fetch warga statistics
+    const households = await prisma.household.findMany();
+    const wargaStats = {
+      totalKepalaKeluarga: households.length,
+      totalLakiLaki: households.reduce((sum, h) => sum + h.totalLakiLaki, 0),
+      totalPerempuan: households.reduce((sum, h) => sum + h.totalPerempuan, 0),
+      totalRumah: households.length,
+    };
+
+    return {
+      success: true,
+      data: {
+        homepage,
+        galleryPreview,
+        wargaStats,
+      },
+    };
   } catch (error) {
     console.error("[v0] Error getting homepage:", error);
     return { success: false, error: "Gagal mengambil data homepage" };

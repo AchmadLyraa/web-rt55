@@ -1,10 +1,16 @@
-import Navigation from '@/components/navigation'
+import Navigation from "@/components/navigation";
+import Footer from "@/components/footer";
 
-export default function PublicLayout({ children }: { children: React.ReactNode }) {
+export default function PublicLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <>
       <Navigation />
       <main>{children}</main>
+      <Footer />
     </>
-  )
+  );
 }
