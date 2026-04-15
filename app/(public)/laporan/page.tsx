@@ -66,11 +66,13 @@ export default function LaporanPage() {
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Header */}
-      <div className="bg-gradient-to-r from-purple-600 to-purple-700 text-white py-16">
-        <div className="container mx-auto px-4">
-          <h1 className="text-5xl font-bold mb-4">Laporan Keuangan</h1>
-          <p className="text-xl text-purple-100">
+      {/* Header - Clean Typography */}
+      <div className="bg-white pt-20 pb-16 border-b border-gray-200">
+        <div className="container mx-auto px-4 text-center">
+          <h1 className="text-6xl md:text-7xl font-bold text-gray-900 mb-4">
+            Laporan Kas
+          </h1>
+          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
             Transparansi penuh atas keuangan RT untuk kepercayaan warga
           </p>
         </div>

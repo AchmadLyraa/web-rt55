@@ -1,29 +1,37 @@
-'use client';
-import Link from 'next/link';
-import { signOut, useSession } from 'next-auth/react';
-import { useState } from 'react';
-import { Menu, X } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+"use client";
+
+import Link from "next/link";
+import { signOut } from "next-auth/react";
+import { useSession } from "next-auth/react";
+import { useState } from "react";
+import { Menu, X } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 export default function AdminNavigation() {
-  const { data: session, status } = useSession();
+  const { data: session } = useSession();
   const [isOpen, setIsOpen] = useState(false);
 
   const adminLinks = [
-    { href: '/admin/homepage', label: 'Kelola Beranda' },
-    { href: '/admin/galeri', label: 'Kelola Galeri' },
-    { href: '/admin/pengumuman', label: 'Kelola Pengumuman' },
-    { href: '/admin/laporan', label: 'Kelola Laporan' },
+    { href: "/admin/homepage", label: "Kelola Beranda" },
+    { href: "/admin/galeri", label: "Kelola Galeri" },
+    { href: "/admin/pengumuman", label: "Kelola Pengumuman" },
+    { href: "/admin/laporan", label: "Kelola Laporan" },
+    { href: "/admin/warga", label: "Data Warga" },
   ];
 
   return (
     <nav className="sticky top-0 z-50 border-b border-border bg-card">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
-          <Link href="/admin/homepage" className="font-bold text-xl text-primary">
+          {/* Logo */}
+          <Link
+            href="/admin/homepage"
+            className="font-bold text-xl text-primary"
+          >
             Admin RT 55
           </Link>
 
+          {/* Desktop Menu */}
           <div className="hidden md:flex items-center gap-1">
             {adminLinks.map((link) => (
               <Link
@@ -36,32 +44,38 @@ export default function AdminNavigation() {
             ))}
           </div>
 
+          {/* Auth & Mobile Menu */}
           <div className="flex items-center gap-2">
-            <div className="hidden md:flex items-center gap-2">
-              {status === 'loading' ? (
-                <span className="text-sm text-muted-foreground">...</span>
-              ) : (
-                <>
-                  <span className="text-sm text-muted-foreground">
-                    {session?.user?.name}
-                  </span>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => signOut({ redirectTo: '/' })}
-                  >
-                    Logout
-                  </Button>
-                </>
-              )}
-            </div>
+            {session?.user && (
+              <div className="hidden md:flex items-center gap-2">
+                <span className="text-sm text-muted-foreground">
+                  {session.user.name}
+                </span>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => signOut({ redirectTo: "/" })}
+                >
+                  Logout
+                </Button>
+              </div>
+            )}
 
-            <button className="md:hidden p-2" onClick={() => setIsOpen(!isOpen)}>
-              {isOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            {/* Mobile Menu Button */}
+            <button
+              className="md:hidden p-2"
+              onClick={() => setIsOpen(!isOpen)}
+            >
+              {isOpen ? (
+                <X className="w-5 h-5" />
+              ) : (
+                <Menu className="w-5 h-5" />
+              )}
             </button>
           </div>
         </div>
 
+        {/* Mobile Menu */}
         {isOpen && (
           <div className="md:hidden border-t border-border py-2 bg-card">
             <div className="space-y-1">
@@ -75,25 +89,27 @@ export default function AdminNavigation() {
                   {link.label}
                 </Link>
               ))}
+
               <div className="my-2 border-t border-border"></div>
-              <div className="space-y-2 px-3 py-2">
-                {status !== 'loading' && (
+
+              {session?.user && (
+                <div className="space-y-2 px-3 py-2">
                   <p className="text-sm text-muted-foreground">
-                    {session?.user?.name}
+                    {session.user.name}
                   </p>
-                )}
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="w-full"
-                  onClick={() => {
-                    signOut({ redirectTo: '/' });
-                    setIsOpen(false);
-                  }}
-                >
-                  Logout
-                </Button>
-              </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="w-full"
+                    onClick={() => {
+                      signOut({ redirectTo: "/" });
+                      setIsOpen(false);
+                    }}
+                  >
+                    Logout
+                  </Button>
+                </div>
+              )}
             </div>
           </div>
         )}

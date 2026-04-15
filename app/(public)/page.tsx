@@ -1,6 +1,7 @@
 import { getHomepage } from "@/app/actions/homepage";
 import Image from "next/image";
 import Link from "next/link";
+import { Maps } from "@/components/maps";
 
 export default async function HomePage() {
   const result = await getHomepage();
@@ -19,9 +20,9 @@ export default async function HomePage() {
         };
 
   return (
-    <div className="min-h-screen bg-white">
-      {/* Hero Section dengan Full Width Image */}
-      <div className="relative w-full h-96 md:h-[500px] bg-gray-800 overflow-hidden">
+    <div className="bg-white">
+      {/* Hero Section dengan Full Viewport Height */}
+      <div className="relative w-full h-screen bg-gray-800 overflow-hidden">
         {homepage?.heroImageUrl ? (
           <Image
             src={homepage.heroImageUrl}
@@ -81,7 +82,64 @@ export default async function HomePage() {
               </div>
             </section>
 
-            {/* Visi & Misi Section dengan Ketua RT */}
+            {/* Sambutan & Ketua RT Section */}
+            <section className="py-16 md:py-24 bg-white">
+              <div className="container mx-auto px-4">
+                <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2 text-center">
+                  Sambutan Ketua RT
+                </h2>
+                <div className="h-1 w-16 bg-blue-600 mx-auto mb-12"></div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-12 max-w-5xl mx-auto items-center">
+                  {/* Sambutan Text - Left on Desktop, Top on Mobile */}
+                  <div className="order-2 md:order-1">
+                    <p className="text-gray-700 text-lg leading-relaxed mb-6">
+                      {homepage.sambutan}
+                    </p>
+                    {homepage.ketuaRtName && (
+                      <div className="pt-4 border-t border-gray-200">
+                        <p className="text-sm text-gray-600">
+                          <span className="font-semibold text-gray-900">
+                            {homepage.ketuaRtName}
+                          </span>
+                        </p>
+                        <p className="text-sm text-gray-500">Ketua RT</p>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Ketua RT Photo - Right on Desktop, Bottom on Mobile */}
+                  {homepage.ketuaRtName && (
+                    <div className="order-1 md:order-2 flex justify-center">
+                      <div className="w-64 h-80">
+                        {homepage.ketuaRtPhotoUrl ? (
+                          <div className="relative w-full h-full rounded-lg overflow-hidden shadow-lg">
+                            <Image
+                              src={homepage.ketuaRtPhotoUrl}
+                              alt={homepage.ketuaRtName}
+                              fill
+                              className="object-cover"
+                            />
+                          </div>
+                        ) : (
+                          <div className="w-full h-full rounded-lg bg-gray-300 flex items-center justify-center">
+                            <svg
+                              className="w-32 h-32 text-gray-400"
+                              fill="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+                            </svg>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </section>
+
+            {/* Visi & Misi Section */}
             <section className="py-16 md:py-24 bg-gray-50">
               <div className="container mx-auto px-4">
                 <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2 text-center">
@@ -89,7 +147,7 @@ export default async function HomePage() {
                 </h2>
                 <div className="h-1 w-16 bg-blue-600 mx-auto mb-12"></div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-12 max-w-5xl mx-auto mb-16">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-12 max-w-5xl mx-auto">
                   {/* Visi */}
                   <div className="bg-white rounded-lg p-8 shadow-sm hover:shadow-md transition-shadow">
                     <h3 className="text-2xl font-bold text-gray-900 mb-4">
@@ -110,38 +168,6 @@ export default async function HomePage() {
                     </p>
                   </div>
                 </div>
-
-                {/* Ketua RT Profile */}
-                {homepage.ketuaRtName && (
-                  <div className="max-w-md mx-auto text-center">
-                    <div className="mb-6">
-                      {homepage.ketuaRtPhotoUrl ? (
-                        <div className="relative w-48 h-48 mx-auto rounded-lg overflow-hidden shadow-md">
-                          <Image
-                            src={homepage.ketuaRtPhotoUrl}
-                            alt={homepage.ketuaRtName}
-                            fill
-                            className="object-cover"
-                          />
-                        </div>
-                      ) : (
-                        <div className="w-48 h-48 mx-auto rounded-lg bg-gray-300 flex items-center justify-center">
-                          <svg
-                            className="w-24 h-24 text-gray-400"
-                            fill="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
-                          </svg>
-                        </div>
-                      )}
-                    </div>
-                    <h3 className="text-xl font-bold text-gray-900">
-                      {homepage.ketuaRtName}
-                    </h3>
-                    <p className="text-gray-600 mt-1">Ketua RT</p>
-                  </div>
-                )}
               </div>
             </section>
 
@@ -254,8 +280,22 @@ export default async function HomePage() {
               </div>
             </section>
 
-            {/* Features/Menu Section */}
+            {/* Maps Section */}
             <section className="py-16 md:py-24 bg-white">
+              <div className="container mx-auto px-4">
+                <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2 text-center">
+                  Lokasi RT
+                </h2>
+                <div className="h-1 w-16 bg-blue-600 mx-auto mb-12"></div>
+
+                <div className="max-w-4xl mx-auto">
+                  <Maps />
+                </div>
+              </div>
+            </section>
+
+            {/* Features/Menu Section */}
+            <section className="py-16 md:py-24 bg-gray-50">
               <div className="container mx-auto px-4">
                 <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2 text-center">
                   Menu Utama

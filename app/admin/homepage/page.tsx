@@ -32,15 +32,16 @@ export default function AdminHomepagePage() {
       try {
         const result = await getHomepage();
         if (result.success && result.data) {
+          const hp = result.data.homepage; // ← tambah ini
           setFormData({
-            rtName: result.data.rtName,
-            sambutan: result.data.sambutan,
-            visi: result.data.visi,
-            misi: result.data.misi,
-            bannerUrl: result.data.bannerUrl || "",
-            heroImageUrl: result.data.heroImageUrl || "",
-            ketuaRtName: result.data.ketuaRtName || "",
-            ketuaRtPhotoUrl: result.data.ketuaRtPhotoUrl || "",
+            rtName: hp?.rtName ?? "",
+            sambutan: hp?.sambutan ?? "",
+            visi: hp?.visi ?? "",
+            misi: hp?.misi ?? "",
+            bannerUrl: hp?.bannerUrl ?? "",
+            heroImageUrl: hp?.heroImageUrl ?? "",
+            ketuaRtName: hp?.ketuaRtName ?? "",
+            ketuaRtPhotoUrl: hp?.ketuaRtPhotoUrl ?? "",
           });
         }
       } catch (err) {

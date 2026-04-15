@@ -1,17 +1,34 @@
-import { getGalleries } from "@/app/actions/gallery";
-import Image from "next/image";
+"use client";
 
-export default async function GalleryPage() {
-  const result = await getGalleries();
-  const galleries = result.success ? result.data : [];
+import { getGalleries } from "@/app/actions/gallery";
+import { GalleryModal } from "@/components/gallery-modal";
+import { useEffect, useState } from "react";
+
+export default function GalleryPage() {
+  const [galleries, setGalleries] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchGalleries = async () => {
+      const result = await getGalleries();
+      if (result.success) {
+        setGalleries(result.data || []);
+      }
+      setLoading(false);
+    };
+
+    fetchGalleries();
+  }, []);
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Header */}
-      <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white py-16">
-        <div className="container mx-auto px-4">
-          <h1 className="text-5xl font-bold mb-4">Galeri Foto</h1>
-          <p className="text-xl text-blue-100">
+      {/* Header - Clean Typography */}
+      <div className="bg-white pt-20 pb-16 border-b border-gray-200">
+        <div className="container mx-auto px-4 text-center">
+          <h1 className="text-6xl md:text-7xl font-bold text-gray-900 mb-4">
+            Galeri
+          </h1>
+          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
             Dokumentasi kegiatan dan momen berharga komunitas RT
           </p>
         </div>
@@ -19,7 +36,30 @@ export default async function GalleryPage() {
 
       {/* Content */}
       <div className="container mx-auto px-4 py-16">
-        {galleries.length === 0 ? (
+        {loading ? (
+          <div className="text-center py-20">
+            <svg
+              className="animate-spin h-8 w-8 text-blue-600 mx-auto mb-4"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <circle
+                className="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                strokeWidth="4"
+              ></circle>
+              <path
+                className="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+              ></path>
+            </svg>
+            <p className="text-gray-500">Memuat galeri...</p>
+          </div>
+        ) : galleries.length === 0 ? (
           <div className="text-center py-20">
             <svg
               className="w-16 h-16 text-gray-300 mx-auto mb-4"
@@ -37,40 +77,7 @@ export default async function GalleryPage() {
             <p className="text-gray-500 text-lg">Belum ada foto di galeri</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {galleries.map((gallery) => (
-              <div key={gallery.id} className="group cursor-pointer">
-                <div className="relative h-72 bg-gray-200 rounded-lg overflow-hidden shadow-md group-hover:shadow-lg transition-shadow">
-                  {gallery.imageUrl && (
-                    <Image
-                      src={gallery.imageUrl}
-                      alt={gallery.title}
-                      fill
-                      className="object-cover group-hover:scale-105 transition-transform duration-300"
-                    />
-                  )}
-                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-end">
-                    <div className="p-4 w-full">
-                      <h3 className="text-white font-bold text-lg">
-                        {gallery.title}
-                      </h3>
-                    </div>
-                  </div>
-                </div>
-                <div className="mt-4">
-                  <h3 className="font-bold text-gray-900 mb-2">
-                    {gallery.title}
-                  </h3>
-                  <p className="text-gray-600 text-sm line-clamp-2 mb-3">
-                    {gallery.description || "Tidak ada deskripsi"}
-                  </p>
-                  <p className="text-xs text-gray-500">
-                    Oleh: {gallery.createdBy.name}
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
+          <GalleryModal galleries={galleries} />
         )}
       </div>
     </div>
