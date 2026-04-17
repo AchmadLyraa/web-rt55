@@ -29,7 +29,7 @@ export default async function AnnouncementDetailPage({
   }
 
   return (
-    <div className="container mx-auto px-4 py-12">
+    <div className="container mx-auto px-4 pb-12 pt-24">
       <Link href="/pengumuman">
         <Button variant="outline" className="mb-4">
           ← Kembali ke Pengumuman

@@ -8,7 +8,7 @@ import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export default function AdminNavigation() {
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
   const [isOpen, setIsOpen] = useState(false);
 
   const adminLinks = [
@@ -24,10 +24,7 @@ export default function AdminNavigation() {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link
-            href="/admin/homepage"
-            className="font-bold text-xl text-primary"
-          >
+          <Link href="/" className="font-bold text-xl text-primary">
             Admin RT 55
           </Link>
 
@@ -46,7 +43,7 @@ export default function AdminNavigation() {
 
           {/* Auth & Mobile Menu */}
           <div className="flex items-center gap-2">
-            {session?.user && (
+            {status !== "loading" && session?.user && (
               <div className="hidden md:flex items-center gap-2">
                 <span className="text-sm text-muted-foreground">
                   {session.user.name}
@@ -92,7 +89,7 @@ export default function AdminNavigation() {
 
               <div className="my-2 border-t border-border"></div>
 
-              {session?.user && (
+              {status !== "loading" && session?.user && (
                 <div className="space-y-2 px-3 py-2">
                   <p className="text-sm text-muted-foreground">
                     {session.user.name}

@@ -1,16 +1,16 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { signInAction } from '@/app/actions/auth';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { signInAction } from "@/app/actions/auth";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function LoginPage() {
   const router = useRouter();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -20,19 +20,19 @@ export default function LoginPage() {
     setError(null);
 
     try {
-      console.log('[v0] Login attempt with email:', email);
+      console.log("[v0] Login attempt with email:", email);
       const result = await signInAction({ email, password });
 
       if (result.success) {
-        console.log('[v0] Login successful, redirecting to admin');
-        router.push('/admin/homepage');
+        console.log("[v0] Login successful, redirecting to admin");
+        router.push("/admin/homepage");
       } else {
-        setError(result.error || 'Terjadi kesalahan');
-        console.log('[v0] Login failed:', result.error);
+        setError(result.error || "Terjadi kesalahan");
+        console.log("[v0] Login failed:", result.error);
       }
     } catch (err) {
-      console.error('[v0] Login error:', err);
-      setError('Terjadi kesalahan saat login');
+      console.error("[v0] Login error:", err);
+      setError("Terjadi kesalahan saat login");
     } finally {
       setIsLoading(false);
     }
@@ -76,17 +76,15 @@ export default function LoginPage() {
               />
             </div>
 
-            <Button
-              type="submit"
-              className="w-full"
-              disabled={isLoading}
-            >
-              {isLoading ? 'Loading...' : 'Login'}
+            <Button type="submit" className="w-full" disabled={isLoading}>
+              {isLoading ? "Loading..." : "Login"}
             </Button>
 
             <p className="text-xs text-muted-foreground text-center mt-4">
-              Demo Credentials:<br />
-              Email: admin@rt.local<br />
+              Demo Credentials:
+              <br />
+              Email: admin@rt.local
+              <br />
               Password: admin123
             </p>
           </form>

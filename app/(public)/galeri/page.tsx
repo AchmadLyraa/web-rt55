@@ -23,17 +23,28 @@ export default function GalleryPage() {
   return (
     <div className="min-h-screen bg-white">
       {/* Header - Clean Typography */}
-      <div className="bg-white pt-20 pb-16 border-b border-gray-200">
-        <div className="container mx-auto px-4 text-center">
-          <h1 className="text-6xl md:text-7xl font-bold text-gray-900 mb-4">
-            Galeri
-          </h1>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            Dokumentasi kegiatan dan momen berharga komunitas RT
+      <div className="pt-28 bg-white relative">
+        <div
+          className="absolute inset-0 opacity-5"
+          style={{
+            backgroundImage:
+              "radial-gradient(circle, #3b82f6 1px, transparent 1px)",
+            backgroundSize: "32px 32px",
+          }}
+        />
+        <div className="container mx-auto px-4 max-w-6xl text-center">
+          <div className="flex items-center justify-center gap-3 mb-4">
+            <div className="h-0.5 w-8 bg-blue-600" />
+            <span className="text-blue-600 text-lg font-bold tracking-widest uppercase">
+              Dokumentasi kegiatan RT 55
+            </span>
+            <div className="h-0.5 w-8 bg-blue-600" />
+          </div>
+          <p className="text-gray-600 max-w-xl mx-auto">
+            Kumpulan momen kegiatan dan interaksi warga RT secara transparan.
           </p>
         </div>
       </div>
-
       {/* Content */}
       <div className="container mx-auto px-4 py-16">
         {loading ? (
