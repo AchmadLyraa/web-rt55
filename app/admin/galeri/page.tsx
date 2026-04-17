@@ -1,25 +1,32 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { getGalleries, createGallery, deleteGallery } from '@/app/actions/gallery';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Textarea } from '@/components/ui/textarea';
-import Image from 'next/image';
+import { useState, useEffect } from "react";
+import {
+  getGalleries,
+  createGallery,
+  deleteGallery,
+  updateGallery,
+} from "@/app/actions/gallery";
+
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Textarea } from "@/components/ui/textarea";
+import Image from "next/image";
 
 export default function AdminGalleryPage() {
   const [galleries, setGalleries] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [isCreating, setIsCreating] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [showForm, setShowForm] = useState(false);
+  const [editingGallery, setEditingGallery] = useState<any | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [uploadProgress, setUploadProgress] = useState(0);
 
   const [formData, setFormData] = useState({
-    title: '',
-    description: '',
-    imageUrl: '',
+    title: "",
+    description: "",
+    imageUrl: "",
   });
 
   useEffect(() => {
@@ -29,11 +36,9 @@ export default function AdminGalleryPage() {
   async function loadGalleries() {
     try {
       const result = await getGalleries();
-      if (result.success) {
-        setGalleries(result.data);
-      }
+      if (result.success) setGalleries(result.data);
     } catch (err) {
-      console.error('[v0] Error loading galleries:', err);
+      console.error(err);
     } finally {
       setIsLoading(false);
     }
@@ -42,171 +47,170 @@ export default function AdminGalleryPage() {
   async function handleUploadImage(file: File) {
     try {
       setUploadProgress(0);
+
       const formDataObj = new FormData();
-      formDataObj.append('file', file);
-      formDataObj.append('category', 'gallery');
+      formDataObj.append("file", file);
+      formDataObj.append("category", "gallery");
 
-      console.log('[v0] Uploading gallery image:', file.name);
-
-      const response = await fetch('/api/upload', {
-        method: 'POST',
+      const response = await fetch("/api/upload", {
+        method: "POST",
         body: formDataObj,
       });
 
-      if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.error || 'Upload failed');
-      }
+      if (!response.ok) throw new Error("Upload gagal");
 
       const data = await response.json();
-      console.log('[v0] Upload successful:', data.fileUrl);
-      setFormData({ ...formData, imageUrl: data.fileUrl });
+
+      setFormData((prev) => ({
+        ...prev,
+        imageUrl: data.fileUrl,
+      }));
+
       setUploadProgress(100);
-    } catch (err) {
-      console.error('[v0] Upload error:', err);
-      setError(err instanceof Error ? err.message : 'Upload gagal');
+    } catch (err: any) {
+      setError(err.message);
     }
+  }
+
+  function resetForm() {
+    setFormData({ title: "", description: "", imageUrl: "" });
+    setEditingGallery(null);
+    setShowForm(false);
   }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    setIsCreating(true);
+    setIsSubmitting(true);
     setError(null);
 
     try {
-      if (!formData.imageUrl) {
-        throw new Error('Foto harus diupload');
-      }
+      if (editingGallery) {
+        // UPDATE
+        const result = await updateGallery({
+          id: editingGallery.id,
+          title: formData.title,
+          description: formData.description,
+        });
 
-      console.log('[v0] Creating gallery');
-      const result = await createGallery(formData);
-
-      if (result.success) {
-        setGalleries([result.data, ...galleries]);
-        setFormData({ title: '', description: '', imageUrl: '' });
-        setShowForm(false);
-        console.log('[v0] Gallery created successfully');
+        if (result.success) {
+          setGalleries((prev) =>
+            prev.map((g) => (g.id === editingGallery.id ? result.data : g)),
+          );
+          resetForm();
+        } else {
+          setError(result.error);
+        }
       } else {
-        setError(result.error || 'Gagal membuat galeri');
+        // CREATE
+        if (!formData.imageUrl) throw new Error("Foto wajib diupload");
+
+        const result = await createGallery(formData);
+
+        if (result.success) {
+          setGalleries((prev) => [result.data, ...prev]);
+          resetForm();
+        } else {
+          setError(result.error);
+        }
       }
-    } catch (err) {
-      console.error('[v0] Error creating gallery:', err);
-      setError(err instanceof Error ? err.message : 'Terjadi kesalahan');
+    } catch (err: any) {
+      setError(err.message);
     } finally {
-      setIsCreating(false);
+      setIsSubmitting(false);
     }
   }
 
   async function handleDelete(id: string) {
-    if (!confirm('Yakin ingin menghapus galeri ini?')) return;
+    if (!confirm("Yakin hapus?")) return;
 
-    try {
-      console.log('[v0] Deleting gallery:', id);
-      const result = await deleteGallery(id);
+    const result = await deleteGallery(id);
 
-      if (result.success) {
-        setGalleries(galleries.filter((g) => g.id !== id));
-        console.log('[v0] Gallery deleted successfully');
-      } else {
-        setError(result.error || 'Gagal menghapus');
-      }
-    } catch (err) {
-      console.error('[v0] Error deleting gallery:', err);
-      setError('Terjadi kesalahan');
+    if (result.success) {
+      setGalleries((prev) => prev.filter((g) => g.id !== id));
+    } else {
+      setError(result.error);
     }
   }
 
+  function handleEdit(gallery: any) {
+    setEditingGallery(gallery);
+    setFormData({
+      title: gallery.title,
+      description: gallery.description || "",
+      imageUrl: gallery.imageUrl,
+    });
+    setShowForm(true);
+  }
+
   if (isLoading) {
-    return (
-      <div className="container mx-auto px-4 py-12">
-        <p className="text-center text-muted-foreground">Loading...</p>
-      </div>
-    );
+    return <p className="text-center py-10">Loading...</p>;
   }
 
   return (
     <div className="container mx-auto px-4 py-12">
-      <div className="mb-8 flex justify-between items-center">
-        <div>
-          <h1 className="text-4xl font-bold mb-2">Kelola Galeri</h1>
-          <p className="text-muted-foreground">Kelola koleksi foto RT</p>
-        </div>
-        <Button onClick={() => setShowForm(!showForm)}>
-          {showForm ? 'Batal' : '+ Tambah Foto'}
+      <div className="flex justify-between mb-6">
+        <h1 className="text-3xl font-bold">Kelola Galeri</h1>
+        <Button
+          onClick={() => {
+            resetForm();
+            setShowForm((prev) => !prev);
+          }}
+        >
+          {showForm ? "Batal" : "+ Tambah"}
         </Button>
       </div>
 
       {error && (
-        <div className="bg-destructive/10 text-destructive px-3 py-2 rounded-md text-sm mb-4">
-          {error}
-        </div>
+        <div className="bg-red-100 text-red-600 p-2 mb-4 rounded">{error}</div>
       )}
 
       {showForm && (
-        <Card className="mb-8">
+        <Card className="mb-6">
           <CardHeader>
-            <CardTitle>Tambah Foto Baru</CardTitle>
+            <CardTitle>
+              {editingGallery ? "Edit Galeri" : "Tambah Galeri"}
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Judul</label>
-                <Input
-                  value={formData.title}
-                  onChange={(e) =>
-                    setFormData({ ...formData, title: e.target.value })
-                  }
-                  placeholder="Judul foto..."
-                  disabled={isCreating}
-                  required
-                />
-              </div>
+              <Input
+                placeholder="Judul"
+                value={formData.title}
+                onChange={(e) =>
+                  setFormData({ ...formData, title: e.target.value })
+                }
+                required
+              />
 
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Deskripsi</label>
-                <Textarea
-                  value={formData.description}
-                  onChange={(e) =>
-                    setFormData({ ...formData, description: e.target.value })
-                  }
-                  placeholder="Deskripsi foto..."
-                  rows={3}
-                  disabled={isCreating}
-                />
-              </div>
+              <Textarea
+                placeholder="Deskripsi"
+                value={formData.description}
+                onChange={(e) =>
+                  setFormData({ ...formData, description: e.target.value })
+                }
+              />
 
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Foto</label>
+              {!editingGallery && (
                 <input
                   type="file"
                   accept="image/*"
                   onChange={(e) => {
-                    const file = e.currentTarget.files?.[0];
-                    if (file) {
-                      handleUploadImage(file);
-                    }
+                    const file = e.target.files?.[0];
+                    if (file) handleUploadImage(file);
                   }}
-                  disabled={isCreating}
-                  className="block w-full text-sm"
-                  required
                 />
-                {formData.imageUrl && (
-                  <div className="text-sm text-muted-foreground">
-                    ✓ Foto sudah diupload
-                  </div>
-                )}
-                {uploadProgress > 0 && uploadProgress < 100 && (
-                  <div className="w-full bg-secondary rounded-full h-2">
-                    <div
-                      className="bg-primary h-2 rounded-full transition-all"
-                      style={{ width: `${uploadProgress}%` }}
-                    />
-                  </div>
-                )}
-              </div>
+              )}
 
-              <Button type="submit" disabled={isCreating} className="w-full">
-                {isCreating ? 'Membuat...' : 'Buat Galeri'}
+              {editingGallery && (
+                <p className="text-xs text-gray-500">Foto tidak bisa diubah</p>
+              )}
+
+              <Button type="submit" disabled={isSubmitting}>
+                {isSubmitting
+                  ? "Processing..."
+                  : editingGallery
+                    ? "Update"
+                    : "Create"}
               </Button>
             </form>
           </CardContent>
@@ -214,40 +218,41 @@ export default function AdminGalleryPage() {
       )}
 
       {galleries.length === 0 ? (
-        <Card>
-          <CardContent className="pt-6">
-            <p className="text-center text-muted-foreground">
-              Belum ada foto. Mulai dengan menambah foto baru.
-            </p>
-          </CardContent>
-        </Card>
+        <p className="text-center text-gray-500">Belum ada data</p>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {galleries.map((gallery) => (
-            <Card key={gallery.id} className="overflow-hidden">
-              <div className="relative h-48 bg-secondary">
-                {gallery.imageUrl && (
-                  <Image
-                    src={gallery.imageUrl}
-                    alt={gallery.title}
-                    fill
-                    className="object-cover"
-                  />
-                )}
+        <div className="grid md:grid-cols-3 gap-4">
+          {galleries.map((g) => (
+            <Card key={g.id}>
+              <div className="relative h-48">
+                <Image
+                  src={g.imageUrl}
+                  alt={g.title}
+                  fill
+                  className="object-cover"
+                />
               </div>
-              <CardContent className="pt-4">
-                <h3 className="font-semibold mb-1">{gallery.title}</h3>
-                <p className="text-xs text-muted-foreground line-clamp-2 mb-4">
-                  {gallery.description || 'Tidak ada deskripsi'}
-                </p>
-                <Button
-                  variant="destructive"
-                  size="sm"
-                  className="w-full"
-                  onClick={() => handleDelete(gallery.id)}
-                >
-                  Hapus
-                </Button>
+
+              <CardContent className="pt-4 space-y-2">
+                <h3 className="font-bold">{g.title}</h3>
+                <p className="text-sm text-gray-500">{g.description || "-"}</p>
+
+                <div className="flex gap-2">
+                  <Button
+                    size="sm"
+                    variant="secondary"
+                    onClick={() => handleEdit(g)}
+                  >
+                    Edit
+                  </Button>
+
+                  <Button
+                    size="sm"
+                    variant="destructive"
+                    onClick={() => handleDelete(g.id)}
+                  >
+                    Hapus
+                  </Button>
+                </div>
               </CardContent>
             </Card>
           ))}

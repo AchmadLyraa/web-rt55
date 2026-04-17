@@ -11,6 +11,12 @@ const gallerySchema = z.object({
   imageUrl: z.string().min(1, "Image URL wajib diisi"),
 });
 
+const updateGallerySchema = z.object({
+  id: z.string(),
+  title: z.string().min(1, "Judul wajib diisi"),
+  description: z.string().optional(),
+});
+
 export async function getGalleries(limit?: number) {
   try {
     const galleries = await prisma.gallery.findMany({
@@ -103,3 +109,32 @@ export async function deleteGallery(id: string) {
   }
 }
 
+export async function updateGallery(data: z.infer<typeof updateGallerySchema>) {
+  try {
+    await requireAdmin();
+
+    const validated = updateGallerySchema.parse(data);
+
+    const gallery = await prisma.gallery.update({
+      where: { id: validated.id },
+      data: {
+        title: validated.title,
+        description: validated.description,
+        // ❌ imageUrl sengaja gak disentuh
+      },
+    });
+
+    revalidatePath("/galeri");
+    revalidatePath("/admin/galeri");
+
+    return { success: true, data: gallery };
+  } catch (error) {
+    console.error("[v0] Error updating gallery:", error);
+
+    if (error instanceof z.ZodError) {
+      return { success: false, error: error.errors[0].message };
+    }
+
+    return { success: false, error: "Gagal update galeri" };
+  }
+}
