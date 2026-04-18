@@ -24,8 +24,10 @@ export default function LoginPage() {
       const result = await signInAction({ email, password });
 
       if (result.success) {
-        console.log("[v0] Login successful, redirecting to admin");
-        router.push("/admin/homepage");
+        // router.refresh();
+        console.log("Login successful, redirecting to admin");
+        // router.push("/admin/homepage");
+        window.location.href = "/admin/homepage";
       } else {
         setError(result.error || "Terjadi kesalahan");
         console.log("[v0] Login failed:", result.error);

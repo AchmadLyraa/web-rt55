@@ -1,35 +1,37 @@
-import type { Metadata } from 'next'
-import { Geist, Geist_Mono } from 'next/font/google'
-import { SessionProvider } from 'next-auth/react'
-import Navigation from '@/components/navigation'
-import './globals.css'
+import type { Metadata } from "next";
+import { Geist, Geist_Mono } from "next/font/google";
+import { SessionProvider } from "next-auth/react";
+import Navigation from "@/components/navigation";
+import "./globals.css";
 
 const _geist = Geist({ subsets: ["latin"] });
 const _geistMono = Geist_Mono({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: 'RT 55 - Website Resmi',
-  description: 'Website resmi Rukun Tetangga 55 untuk komunikasi dan informasi warga',
+  title: "RT 55 - Website Resmi",
+  description:
+    "Website resmi Rukun Tetangga 55 untuk komunikasi dan informasi warga",
   icons: {
     icon: [
-      { url: '/icon-light-32x32.png', media: '(prefers-color-scheme: light)' },
-      { url: '/icon-dark-32x32.png', media: '(prefers-color-scheme: dark)' },
-      { url: '/icon.svg', type: 'image/svg+xml' },
+      { url: "/icon-light-32x32.png", media: "(prefers-color-scheme: light)" },
+      { url: "/icon-dark-32x32.png", media: "(prefers-color-scheme: dark)" },
+      { url: "/icon.svg", type: "image/svg+xml" },
     ],
-    apple: '/apple-icon.png',
+    apple: "/apple-icon.png",
   },
-}
+};
 
-export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+export default function RootLayout({
+  children,
+}: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="id">
       <body className="font-sans antialiased bg-background text-foreground">
         <SessionProvider>
-          <main>
-            {children}
-          </main>
+          {/*<SessionProvider refetchOnWindowFocus={true} refetchInterval={0}>*/}
+          <main>{children}</main>
         </SessionProvider>
       </body>
     </html>
-  )
+  );
 }
