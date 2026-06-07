@@ -28,7 +28,6 @@ export default function RootLayout({
     <html lang="id">
       <body className="font-sans antialiased bg-background text-foreground">
         <SessionProvider>
-          {/*<SessionProvider refetchOnWindowFocus={true} refetchInterval={0}>*/}
           <main>{children}</main>
         </SessionProvider>
       </body>

@@ -1,15 +1,17 @@
 "use server";
-
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/auth";
 import { z } from "zod";
 import { revalidatePath } from "next/cache";
+import { deletePublicFile } from "@/lib/file";
 
 const announcementSchema = z.object({
   title: z.string().min(1, "Judul wajib diisi"),
   content: z.string().min(1, "Konten wajib diisi"),
   attachment: z.string().optional(),
 });
+
+const ITEMS_PER_PAGE = 20;
 
 export async function getAnnouncements(limit?: number) {
   try {
@@ -28,6 +30,44 @@ export async function getAnnouncements(limit?: number) {
     return { success: true, data: announcements };
   } catch (error) {
     console.error("[v0] Error getting announcements:", error);
+    return { success: false, error: "Gagal mengambil data pengumuman" };
+  }
+}
+
+export async function getAnnouncementsPaginated(page: number = 1) {
+  try {
+    const skip = (page - 1) * ITEMS_PER_PAGE;
+
+    const [announcements, total] = await Promise.all([
+      prisma.announcement.findMany({
+        include: {
+          createdBy: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
+        },
+        orderBy: { createdAt: "desc" },
+        skip,
+        take: ITEMS_PER_PAGE,
+      }),
+      prisma.announcement.count(),
+    ]);
+
+    return {
+      success: true,
+      data: announcements,
+      pagination: {
+        page,
+        totalItems: total,
+        totalPages: Math.ceil(total / ITEMS_PER_PAGE),
+        hasNext: page < Math.ceil(total / ITEMS_PER_PAGE),
+        hasPrev: page > 1,
+      },
+    };
+  } catch (error) {
+    console.error("[v0] Error getting announcements paginated:", error);
     return { success: false, error: "Gagal mengambil data pengumuman" };
   }
 }
@@ -53,12 +93,11 @@ export async function getAnnouncementById(id: string) {
 }
 
 export async function createAnnouncement(
-  data: z.infer<typeof announcementSchema>
+  data: z.infer<typeof announcementSchema>,
 ) {
   try {
     const session = await requireAdmin();
     const validated = announcementSchema.parse(data);
-
     const announcement = await prisma.announcement.create({
       data: {
         ...validated,
@@ -73,10 +112,8 @@ export async function createAnnouncement(
         },
       },
     });
-
     revalidatePath("/pengumuman");
     revalidatePath("/admin/pengumuman");
-
     return { success: true, data: announcement };
   } catch (error) {
     console.error("[v0] Error creating announcement:", error);
@@ -89,11 +126,17 @@ export async function createAnnouncement(
 
 export async function updateAnnouncement(
   id: string,
-  data: z.infer<typeof announcementSchema>
+  data: z.infer<typeof announcementSchema>,
 ) {
   try {
     await requireAdmin();
     const validated = announcementSchema.parse(data);
+
+    const existing = await prisma.announcement.findUnique({ where: { id } });
+
+    if (existing?.attachment && existing.attachment !== validated.attachment) {
+      await deletePublicFile(existing.attachment);
+    }
 
     const announcement = await prisma.announcement.update({
       where: { id },
@@ -107,10 +150,8 @@ export async function updateAnnouncement(
         },
       },
     });
-
     revalidatePath("/pengumuman");
     revalidatePath("/admin/pengumuman");
-
     return { success: true, data: announcement };
   } catch (error) {
     console.error("[v0] Error updating announcement:", error);
@@ -125,17 +166,17 @@ export async function deleteAnnouncement(id: string) {
   try {
     await requireAdmin();
 
+    const existing = await prisma.announcement.findUnique({ where: { id } });
+    await deletePublicFile(existing?.attachment);
+
     const announcement = await prisma.announcement.delete({
       where: { id },
     });
-
     revalidatePath("/pengumuman");
     revalidatePath("/admin/pengumuman");
-
     return { success: true, data: announcement };
   } catch (error) {
     console.error("[v0] Error deleting announcement:", error);
     return { success: false, error: "Gagal menghapus pengumuman" };
   }
 }
-

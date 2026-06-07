@@ -1,20 +1,27 @@
-import { getAnnouncements } from "@/app/actions/announcement";
+import { getAnnouncementsPaginated } from "@/app/actions/announcement";
 import Link from "next/link";
 import { format } from "date-fns";
 import { id as idLocale } from "date-fns/locale";
 import { FileText, Paperclip } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
-export default async function AnnouncementsPage() {
-  const result = await getAnnouncements();
+export default async function AnnouncementsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string }>;
+}) {
+  const { page: pageParam } = await searchParams;
+  const page = Math.max(1, parseInt(pageParam || "1", 10));
+
+  const result = await getAnnouncementsPaginated(page);
   const announcements = result.success ? result.data : [];
+  const pagination = result.success ? result.pagination : null;
 
-  // Split: top 4 as cards, rest as list
   const topAnnouncements = announcements.slice(0, 4);
   const restAnnouncements = announcements.slice(4);
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Header - Clean Typography */}
       <div className="pt-28 bg-white relative">
         <div
           className="absolute inset-0 opacity-5"
@@ -38,16 +45,14 @@ export default async function AnnouncementsPage() {
         </div>
       </div>
 
-      {/* Content */}
       <div className="container mx-auto px-4 py-16">
         {announcements.length === 0 ? (
           <div className="text-center py-20">
-            <FileText className="w-5 h-5 text-blue-600" />
+            <FileText className="w-5 h-5 text-blue-600 mx-auto mb-4" />
             <p className="text-gray-500 text-lg">Belum ada pengumuman</p>
           </div>
         ) : (
           <>
-            {/* Top 4 Announcements - Card Grid */}
             {topAnnouncements.length > 0 && (
               <div className="mb-16">
                 <h2 className="text-2xl font-bold text-gray-900 mb-8">
@@ -93,7 +98,6 @@ export default async function AnnouncementsPage() {
               </div>
             )}
 
-            {/* Rest of Announcements - List */}
             {restAnnouncements.length > 0 && (
               <div>
                 <h2 className="text-2xl font-bold text-gray-900 mb-6">
@@ -131,6 +135,52 @@ export default async function AnnouncementsPage() {
                     </Link>
                   ))}
                 </div>
+              </div>
+            )}
+
+            {pagination && pagination.totalPages > 1 && (
+              <div className="flex justify-center items-center gap-2 mt-12">
+                <Link
+                  href={`/pengumuman?page=${page - 1}`}
+                  aria-disabled={!pagination.hasPrev}
+                  tabIndex={!pagination.hasPrev ? -1 : undefined}
+                >
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    disabled={!pagination.hasPrev}
+                  >
+                    ← Prev
+                  </Button>
+                </Link>
+
+                {Array.from(
+                  { length: pagination.totalPages },
+                  (_, i) => i + 1,
+                ).map((p) => (
+                  <Link key={p} href={`/pengumuman?page=${p}`}>
+                    <Button
+                      variant={p === page ? "default" : "outline"}
+                      size="sm"
+                    >
+                      {p}
+                    </Button>
+                  </Link>
+                ))}
+
+                <Link
+                  href={`/pengumuman?page=${page + 1}`}
+                  aria-disabled={!pagination.hasNext}
+                  tabIndex={!pagination.hasNext ? -1 : undefined}
+                >
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    disabled={!pagination.hasNext}
+                  >
+                    Next →
+                  </Button>
+                </Link>
               </div>
             )}
           </>

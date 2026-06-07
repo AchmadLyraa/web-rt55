@@ -1,28 +1,31 @@
 "use client";
-
-import { getGalleries } from "@/app/actions/gallery";
+import { getGalleriesPaginated } from "@/app/actions/gallery";
 import { GalleryModal } from "@/components/gallery-modal";
 import { useEffect, useState } from "react";
+import { Button } from "@/components/ui/button";
 
 export default function GalleryPage() {
-  const [galleries, setGalleries] = useState([]);
+  const [galleries, setGalleries] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
   useEffect(() => {
-    const fetchGalleries = async () => {
-      const result = await getGalleries();
-      if (result.success) {
-        setGalleries(result.data || []);
-      }
-      setLoading(false);
-    };
+    fetchGalleries(page);
+  }, [page]);
 
-    fetchGalleries();
-  }, []);
+  async function fetchGalleries(p: number) {
+    setLoading(true);
+    const result = await getGalleriesPaginated(p);
+    if (result.success) {
+      setGalleries(result.data || []);
+      setTotalPages(result.pagination.totalPages);
+    }
+    setLoading(false);
+  }
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Header - Clean Typography */}
       <div className="pt-28 bg-white relative">
         <div
           className="absolute inset-0 opacity-5"
@@ -45,7 +48,7 @@ export default function GalleryPage() {
           </p>
         </div>
       </div>
-      {/* Content */}
+
       <div className="container mx-auto px-4 py-16">
         {loading ? (
           <div className="text-center py-20">
@@ -61,12 +64,12 @@ export default function GalleryPage() {
                 r="10"
                 stroke="currentColor"
                 strokeWidth="4"
-              ></circle>
+              />
               <path
                 className="opacity-75"
                 fill="currentColor"
                 d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-              ></path>
+              />
             </svg>
             <p className="text-gray-500">Memuat galeri...</p>
           </div>
@@ -88,7 +91,44 @@ export default function GalleryPage() {
             <p className="text-gray-500 text-lg">Belum ada foto di galeri</p>
           </div>
         ) : (
-          <GalleryModal galleries={galleries} />
+          <>
+            <GalleryModal galleries={galleries} />
+
+            {totalPages > 1 && (
+              <div className="flex justify-center items-center gap-2 mt-10">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setPage((p) => p - 1)}
+                  disabled={page === 1}
+                >
+                  ← Prev
+                </Button>
+
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                  (p) => (
+                    <Button
+                      key={p}
+                      variant={p === page ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => setPage(p)}
+                    >
+                      {p}
+                    </Button>
+                  ),
+                )}
+
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setPage((p) => p + 1)}
+                  disabled={page === totalPages}
+                >
+                  Next →
+                </Button>
+              </div>
+            )}
+          </>
         )}
       </div>
     </div>

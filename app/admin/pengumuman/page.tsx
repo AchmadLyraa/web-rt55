@@ -1,18 +1,18 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 import {
-  getAnnouncements,
+  getAnnouncementsPaginated,
   createAnnouncement,
   updateAnnouncement,
   deleteAnnouncement,
-} from '@/app/actions/announcement';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Textarea } from '@/components/ui/textarea';
-import { format } from 'date-fns';
-import { id } from 'date-fns/locale';
+} from "@/app/actions/announcement";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Textarea } from "@/components/ui/textarea";
+import { format } from "date-fns";
+import { id } from "date-fns/locale";
 
 export default function AdminAnnouncementsPage() {
   const [announcements, setAnnouncements] = useState<any[]>([]);
@@ -22,25 +22,29 @@ export default function AdminAnnouncementsPage() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [uploadProgress, setUploadProgress] = useState(0);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
   const [formData, setFormData] = useState({
-    title: '',
-    content: '',
-    attachment: '',
+    title: "",
+    content: "",
+    attachment: "",
   });
 
   useEffect(() => {
-    loadAnnouncements();
-  }, []);
+    loadAnnouncements(page);
+  }, [page]);
 
-  async function loadAnnouncements() {
+  async function loadAnnouncements(p: number) {
+    setIsLoading(true);
     try {
-      const result = await getAnnouncements();
+      const result = await getAnnouncementsPaginated(p);
       if (result.success) {
         setAnnouncements(result.data);
+        setTotalPages(result.pagination.totalPages);
       }
     } catch (err) {
-      console.error('[v0] Error loading announcements:', err);
+      console.error("[v0] Error loading announcements:", err);
     } finally {
       setIsLoading(false);
     }
@@ -50,25 +54,25 @@ export default function AdminAnnouncementsPage() {
     try {
       setUploadProgress(0);
       const formDataObj = new FormData();
-      formDataObj.append('file', file);
-      formDataObj.append('category', 'announcements');
+      formDataObj.append("file", file);
+      formDataObj.append("category", "announcements");
 
-      const response = await fetch('/api/upload', {
-        method: 'POST',
+      const response = await fetch("/api/upload", {
+        method: "POST",
         body: formDataObj,
       });
 
       if (!response.ok) {
         const data = await response.json();
-        throw new Error(data.error || 'Upload failed');
+        throw new Error(data.error || "Upload failed");
       }
 
       const data = await response.json();
-      setFormData({ ...formData, attachment: data.fileUrl });
+      setFormData((prev) => ({ ...prev, attachment: data.fileUrl }));
       setUploadProgress(100);
     } catch (err) {
-      console.error('[v0] Upload error:', err);
-      setError(err instanceof Error ? err.message : 'Upload gagal');
+      console.error("[v0] Upload error:", err);
+      setError(err instanceof Error ? err.message : "Upload gagal");
     }
   }
 
@@ -84,39 +88,40 @@ export default function AdminAnnouncementsPage() {
 
       if (result.success) {
         if (editingId) {
-          setAnnouncements(
-            announcements.map((a) => (a.id === editingId ? result.data : a))
+          setAnnouncements((prev) =>
+            prev.map((a) => (a.id === editingId ? result.data : a)),
           );
           setEditingId(null);
         } else {
-          setAnnouncements([result.data, ...announcements]);
+          await loadAnnouncements(1);
+          setPage(1);
         }
-        setFormData({ title: '', content: '', attachment: '' });
+        setFormData({ title: "", content: "", attachment: "" });
         setShowForm(false);
       } else {
-        setError(result.error || 'Gagal menyimpan');
+        setError(result.error || "Gagal menyimpan");
       }
     } catch (err) {
-      console.error('[v0] Error:', err);
-      setError('Terjadi kesalahan');
+      console.error("[v0] Error:", err);
+      setError("Terjadi kesalahan");
     } finally {
       setIsSubmitting(false);
     }
   }
 
   async function handleDelete(id: string) {
-    if (!confirm('Yakin ingin menghapus pengumuman ini?')) return;
+    if (!confirm("Yakin ingin menghapus pengumuman ini?")) return;
 
     try {
       const result = await deleteAnnouncement(id);
       if (result.success) {
-        setAnnouncements(announcements.filter((a) => a.id !== id));
+        await loadAnnouncements(page);
       } else {
-        setError(result.error || 'Gagal menghapus');
+        setError(result.error || "Gagal menghapus");
       }
     } catch (err) {
-      console.error('[v0] Error deleting:', err);
-      setError('Terjadi kesalahan');
+      console.error("[v0] Error deleting:", err);
+      setError("Terjadi kesalahan");
     }
   }
 
@@ -124,7 +129,7 @@ export default function AdminAnnouncementsPage() {
     setFormData({
       title: announcement.title,
       content: announcement.content,
-      attachment: announcement.attachment || '',
+      attachment: announcement.attachment || "",
     });
     setEditingId(announcement.id);
     setShowForm(true);
@@ -143,10 +148,18 @@ export default function AdminAnnouncementsPage() {
       <div className="mb-8 flex justify-between items-center">
         <div>
           <h1 className="text-4xl font-bold mb-2">Kelola Pengumuman</h1>
-          <p className="text-muted-foreground">Buat dan kelola pengumuman untuk warga</p>
+          <p className="text-muted-foreground">
+            Buat dan kelola pengumuman untuk warga
+          </p>
         </div>
-        <Button onClick={() => { setShowForm(!showForm); setEditingId(null); setFormData({ title: '', content: '', attachment: '' }); }}>
-          {showForm ? 'Batal' : '+ Buat Pengumuman'}
+        <Button
+          onClick={() => {
+            setShowForm(!showForm);
+            setEditingId(null);
+            setFormData({ title: "", content: "", attachment: "" });
+          }}
+        >
+          {showForm ? "Batal" : "+ Buat Pengumuman"}
         </Button>
       </div>
 
@@ -159,7 +172,9 @@ export default function AdminAnnouncementsPage() {
       {showForm && (
         <Card className="mb-8">
           <CardHeader>
-            <CardTitle>{editingId ? 'Edit Pengumuman' : 'Buat Pengumuman Baru'}</CardTitle>
+            <CardTitle>
+              {editingId ? "Edit Pengumuman" : "Buat Pengumuman Baru"}
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
@@ -191,14 +206,14 @@ export default function AdminAnnouncementsPage() {
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-medium">File Terlampir (Opsional)</label>
+                <label className="text-sm font-medium">
+                  File Terlampir (Opsional)
+                </label>
                 <input
                   type="file"
                   onChange={(e) => {
                     const file = e.currentTarget.files?.[0];
-                    if (file) {
-                      handleUploadAttachment(file);
-                    }
+                    if (file) handleUploadAttachment(file);
                   }}
                   disabled={isSubmitting}
                   className="block w-full text-sm"
@@ -219,7 +234,11 @@ export default function AdminAnnouncementsPage() {
               </div>
 
               <Button type="submit" disabled={isSubmitting} className="w-full">
-                {isSubmitting ? 'Menyimpan...' : editingId ? 'Update' : 'Buat Pengumuman'}
+                {isSubmitting
+                  ? "Menyimpan..."
+                  : editingId
+                    ? "Update"
+                    : "Buat Pengumuman"}
               </Button>
             </form>
           </CardContent>
@@ -235,41 +254,80 @@ export default function AdminAnnouncementsPage() {
           </CardContent>
         </Card>
       ) : (
-        <div className="space-y-4">
-          {announcements.map((announcement) => (
-            <Card key={announcement.id}>
-              <CardHeader>
-                <CardTitle className="text-lg">{announcement.title}</CardTitle>
-                <p className="text-xs text-muted-foreground mt-1">
-                  {format(new Date(announcement.createdAt), 'd MMMM yyyy HH:mm', {
-                    locale: id,
-                  })}
-                </p>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground mb-4 line-clamp-2">
-                  {announcement.content}
-                </p>
-                <div className="flex gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleEdit(announcement)}
-                  >
-                    Edit
-                  </Button>
-                  <Button
-                    variant="destructive"
-                    size="sm"
-                    onClick={() => handleDelete(announcement.id)}
-                  >
-                    Hapus
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+        <>
+          <div className="space-y-4">
+            {announcements.map((announcement) => (
+              <Card key={announcement.id}>
+                <CardHeader>
+                  <CardTitle className="text-lg">
+                    {announcement.title}
+                  </CardTitle>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    {format(
+                      new Date(announcement.createdAt),
+                      "d MMMM yyyy HH:mm",
+                      { locale: id },
+                    )}
+                  </p>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-muted-foreground mb-4 line-clamp-2">
+                    {announcement.content}
+                  </p>
+                  <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleEdit(announcement)}
+                    >
+                      Edit
+                    </Button>
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      onClick={() => handleDelete(announcement.id)}
+                    >
+                      Hapus
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+
+          {totalPages > 1 && (
+            <div className="flex justify-center items-center gap-2 mt-10">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setPage((p) => p - 1)}
+                disabled={page === 1}
+              >
+                ← Prev
+              </Button>
+
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
+                <Button
+                  key={p}
+                  variant={p === page ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setPage(p)}
+                >
+                  {p}
+                </Button>
+              ))}
+
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setPage((p) => p + 1)}
+                disabled={page === totalPages}
+              >
+                Next →
+              </Button>
+            </div>
+          )}
+        </>
       )}
     </div>
   );

@@ -13,13 +13,13 @@ const transactionSchema = z.object({
   date: z.string().transform((val) => new Date(val)),
 });
 
-export async function getTransactions(
-  filters?: {
-    type?: "PEMASUKAN" | "PENGELUARAN";
-    startDate?: Date;
-    endDate?: Date;
-  }
-) {
+const ITEMS_PER_PAGE = 20;
+
+export async function getTransactions(filters?: {
+  type?: "PEMASUKAN" | "PENGELUARAN";
+  startDate?: Date;
+  endDate?: Date;
+}) {
   try {
     const whereCondition: any = {};
 
@@ -29,82 +29,114 @@ export async function getTransactions(
 
     if (filters?.startDate || filters?.endDate) {
       whereCondition.date = {};
-      if (filters.startDate) {
-        whereCondition.date.gte = filters.startDate;
-      }
-      if (filters.endDate) {
-        whereCondition.date.lte = filters.endDate;
-      }
+      if (filters.startDate) whereCondition.date.gte = filters.startDate;
+      if (filters.endDate) whereCondition.date.lte = filters.endDate;
     }
 
     const transactions = await prisma.cashTransaction.findMany({
       where: whereCondition,
       include: {
         createdBy: {
-          select: {
-            id: true,
-            name: true,
-          },
+          select: { id: true, name: true },
         },
       },
       orderBy: { date: "desc" },
     });
 
-    // Convert Decimal to number for client component
-    const convertedTransactions = transactions.map((t) => ({
-      ...t,
-      amount: Number(t.amount),
-    }));
-
-    return { success: true, data: convertedTransactions };
+    return {
+      success: true,
+      data: transactions.map((t) => ({ ...t, amount: Number(t.amount) })),
+    };
   } catch (error) {
     console.error("[v0] Error getting transactions:", error);
     return { success: false, error: "Gagal mengambil data transaksi" };
   }
 }
 
-export async function getTransactionSummary(
-  startDate?: Date,
-  endDate?: Date
+export async function getTransactionsPaginated(
+  page: number = 1,
+  filters?: {
+    type?: "PEMASUKAN" | "PENGELUARAN";
+    startDate?: Date;
+    endDate?: Date;
+  },
 ) {
+  try {
+    const skip = (page - 1) * ITEMS_PER_PAGE;
+    const whereCondition: any = {};
+
+    if (filters?.type) {
+      whereCondition.type = filters.type;
+    }
+
+    if (filters?.startDate || filters?.endDate) {
+      whereCondition.date = {};
+      if (filters.startDate) whereCondition.date.gte = filters.startDate;
+      if (filters.endDate) whereCondition.date.lte = filters.endDate;
+    }
+
+    const [transactions, total] = await Promise.all([
+      prisma.cashTransaction.findMany({
+        where: whereCondition,
+        include: {
+          createdBy: {
+            select: { id: true, name: true },
+          },
+        },
+        orderBy: { date: "desc" },
+        skip,
+        take: ITEMS_PER_PAGE,
+      }),
+      prisma.cashTransaction.count({ where: whereCondition }),
+    ]);
+
+    return {
+      success: true,
+      data: transactions.map((t) => ({ ...t, amount: Number(t.amount) })),
+      pagination: {
+        page,
+        totalItems: total,
+        totalPages: Math.ceil(total / ITEMS_PER_PAGE),
+        hasNext: page < Math.ceil(total / ITEMS_PER_PAGE),
+        hasPrev: page > 1,
+      },
+    };
+  } catch (error) {
+    console.error("[v0] Error getting transactions paginated:", error);
+    return { success: false, error: "Gagal mengambil data transaksi" };
+  }
+}
+
+export async function getTransactionSummary(startDate?: Date, endDate?: Date) {
   try {
     const whereCondition: any = {};
 
     if (startDate || endDate) {
       whereCondition.date = {};
-      if (startDate) {
-        whereCondition.date.gte = startDate;
-      }
-      if (endDate) {
-        whereCondition.date.lte = endDate;
-      }
+      if (startDate) whereCondition.date.gte = startDate;
+      if (endDate) whereCondition.date.lte = endDate;
     }
 
-    const pemasukan = await prisma.cashTransaction.aggregate({
-      where: { ...whereCondition, type: "PEMASUKAN" },
-      _sum: {
-        amount: true,
-      },
-    });
+    const [pemasukan, pengeluaran] = await Promise.all([
+      prisma.cashTransaction.aggregate({
+        where: { ...whereCondition, type: "PEMASUKAN" },
+        _sum: { amount: true },
+      }),
+      prisma.cashTransaction.aggregate({
+        where: { ...whereCondition, type: "PENGELUARAN" },
+        _sum: { amount: true },
+      }),
+    ]);
 
-    const pengeluaran = await prisma.cashTransaction.aggregate({
-      where: { ...whereCondition, type: "PENGELUARAN" },
-      _sum: {
-        amount: true,
-      },
-    });
-
-    // Convert Decimal to number for client component
     const totalPemasukan = Number(pemasukan._sum.amount || 0);
     const totalPengeluaran = Number(pengeluaran._sum.amount || 0);
-    const balance = totalPemasukan - totalPengeluaran;
 
     return {
       success: true,
       data: {
         totalPemasukan,
         totalPengeluaran,
-        balance,
+        balance: totalPemasukan - totalPengeluaran,
       },
     };
   } catch (error) {
@@ -114,7 +146,7 @@ export async function getTransactionSummary(
 }
 
 export async function createTransaction(
-  data: z.infer<typeof transactionSchema>
+  data: z.infer<typeof transactionSchema>,
 ) {
   try {
     const session = await requireAdmin();
@@ -127,24 +159,18 @@ export async function createTransaction(
       },
       include: {
         createdBy: {
-          select: {
-            id: true,
-            name: true,
-          },
+          select: { id: true, name: true },
         },
       },
     });
 
-    // Convert Decimal to number for client component
-    const convertedTransaction = {
-      ...transaction,
-      amount: Number(transaction.amount),
-    };
-
     revalidatePath("/laporan");
     revalidatePath("/admin/laporan");
 
-    return { success: true, data: convertedTransaction };
+    return {
+      success: true,
+      data: { ...transaction, amount: Number(transaction.amount) },
+    };
   } catch (error) {
     console.error("[v0] Error creating transaction:", error);
     if (error instanceof z.ZodError) {
@@ -158,23 +184,17 @@ export async function deleteTransaction(id: string) {
   try {
     await requireAdmin();
 
-    const transaction = await prisma.cashTransaction.delete({
-      where: { id },
-    });
-
-    // Convert Decimal to number for client component
-    const convertedTransaction = {
-      ...transaction,
-      amount: Number(transaction.amount),
-    };
+    const transaction = await prisma.cashTransaction.delete({ where: { id } });
 
     revalidatePath("/laporan");
     revalidatePath("/admin/laporan");
 
-    return { success: true, data: convertedTransaction };
+    return {
+      success: true,
+      data: { ...transaction, amount: Number(transaction.amount) },
+    };
   } catch (error) {
     console.error("[v0] Error deleting transaction:", error);
     return { success: false, error: "Gagal menghapus transaksi" };
   }
 }
-

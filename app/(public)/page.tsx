@@ -100,7 +100,7 @@ export default async function HomePage() {
                 Ketua RT
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
-                <div className="md:order-1">
+                <div className="order-2 md:order-1">
                   <p className="text-gray-600 text-lg leading-relaxed mb-8">
                     {homepage.sambutan}
                   </p>
@@ -282,16 +282,38 @@ export default async function HomePage() {
 
               {galleryPreview.length > 0 ? (
                 <>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                  <div
+                    className={`grid gap-3 ${
+                      galleryPreview.length === 1
+                        ? "grid-cols-1"
+                        : galleryPreview.length === 2
+                          ? "grid-cols-2"
+                          : galleryPreview.length === 3
+                            ? "grid-cols-3"
+                            : "grid-cols-2"
+                    }`}
+                  >
                     {galleryPreview.map((gallery, i) => (
                       <div
                         key={gallery.id}
                         className={`group cursor-pointer rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1 ${
-                          i === 0 ? "md:col-span-2 md:row-span-2" : ""
+                          galleryPreview.length === 4 && i === 0
+                            ? "col-span-2 row-span-2"
+                            : ""
                         }`}
                       >
                         <div
-                          className={`relative bg-gray-200 ${i === 0 ? "h-72 md:h-full" : "h-44"}`}
+                          className={`relative bg-gray-200 ${
+                            galleryPreview.length === 1
+                              ? "h-96"
+                              : galleryPreview.length === 2
+                                ? "h-72"
+                                : galleryPreview.length === 3
+                                  ? "h-64"
+                                  : i === 0
+                                    ? "h-96"
+                                    : "h-44"
+                          }`}
                         >
                           {gallery.imageUrl && (
                             <Image

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import {
-  getGalleries,
+  getGalleriesPaginated,
   createGallery,
   deleteGallery,
   updateGallery,
@@ -21,7 +21,8 @@ export default function AdminGalleryPage() {
   const [showForm, setShowForm] = useState(false);
   const [editingGallery, setEditingGallery] = useState<any | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [uploadProgress, setUploadProgress] = useState(0);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
   const [formData, setFormData] = useState({
     title: "",
@@ -30,13 +31,17 @@ export default function AdminGalleryPage() {
   });
 
   useEffect(() => {
-    loadGalleries();
-  }, []);
+    loadGalleries(page);
+  }, [page]);
 
-  async function loadGalleries() {
+  async function loadGalleries(p: number) {
+    setIsLoading(true);
     try {
-      const result = await getGalleries();
-      if (result.success) setGalleries(result.data);
+      const result = await getGalleriesPaginated(p);
+      if (result.success) {
+        setGalleries(result.data);
+        setTotalPages(result.pagination.totalPages);
+      }
     } catch (err) {
       console.error(err);
     } finally {
@@ -46,8 +51,6 @@ export default function AdminGalleryPage() {
 
   async function handleUploadImage(file: File) {
     try {
-      setUploadProgress(0);
-
       const formDataObj = new FormData();
       formDataObj.append("file", file);
       formDataObj.append("category", "gallery");
@@ -60,13 +63,7 @@ export default function AdminGalleryPage() {
       if (!response.ok) throw new Error("Upload gagal");
 
       const data = await response.json();
-
-      setFormData((prev) => ({
-        ...prev,
-        imageUrl: data.fileUrl,
-      }));
-
-      setUploadProgress(100);
+      setFormData((prev) => ({ ...prev, imageUrl: data.fileUrl }));
     } catch (err: any) {
       setError(err.message);
     }
@@ -85,7 +82,6 @@ export default function AdminGalleryPage() {
 
     try {
       if (editingGallery) {
-        // UPDATE
         const result = await updateGallery({
           id: editingGallery.id,
           title: formData.title,
@@ -101,13 +97,13 @@ export default function AdminGalleryPage() {
           setError(result.error);
         }
       } else {
-        // CREATE
         if (!formData.imageUrl) throw new Error("Foto wajib diupload");
 
         const result = await createGallery(formData);
 
         if (result.success) {
-          setGalleries((prev) => [result.data, ...prev]);
+          await loadGalleries(1);
+          setPage(1);
           resetForm();
         } else {
           setError(result.error);
@@ -126,7 +122,7 @@ export default function AdminGalleryPage() {
     const result = await deleteGallery(id);
 
     if (result.success) {
-      setGalleries((prev) => prev.filter((g) => g.id !== id));
+      await loadGalleries(page);
     } else {
       setError(result.error);
     }
@@ -220,43 +216,80 @@ export default function AdminGalleryPage() {
       {galleries.length === 0 ? (
         <p className="text-center text-gray-500">Belum ada data</p>
       ) : (
-        <div className="grid md:grid-cols-3 gap-4">
-          {galleries.map((g) => (
-            <Card key={g.id}>
-              <div className="relative h-48">
-                <Image
-                  src={g.imageUrl}
-                  alt={g.title}
-                  fill
-                  className="object-cover"
-                />
-              </div>
-
-              <CardContent className="pt-4 space-y-2">
-                <h3 className="font-bold">{g.title}</h3>
-                <p className="text-sm text-gray-500">{g.description || "-"}</p>
-
-                <div className="flex gap-2">
-                  <Button
-                    size="sm"
-                    variant="secondary"
-                    onClick={() => handleEdit(g)}
-                  >
-                    Edit
-                  </Button>
-
-                  <Button
-                    size="sm"
-                    variant="destructive"
-                    onClick={() => handleDelete(g.id)}
-                  >
-                    Hapus
-                  </Button>
+        <>
+          <div className="grid md:grid-cols-3 gap-4">
+            {galleries.map((g) => (
+              <Card key={g.id}>
+                <div className="relative h-48">
+                  <Image
+                    src={g.imageUrl}
+                    alt={g.title}
+                    fill
+                    className="object-cover"
+                  />
                 </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+
+                <CardContent className="pt-4 space-y-2">
+                  <h3 className="font-bold">{g.title}</h3>
+                  <p className="text-sm text-gray-500">
+                    {g.description || "-"}
+                  </p>
+
+                  <div className="flex gap-2">
+                    <Button
+                      size="sm"
+                      variant="secondary"
+                      onClick={() => handleEdit(g)}
+                    >
+                      Edit
+                    </Button>
+
+                    <Button
+                      size="sm"
+                      variant="destructive"
+                      onClick={() => handleDelete(g.id)}
+                    >
+                      Hapus
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+
+          {totalPages > 1 && (
+            <div className="flex justify-center items-center gap-2 mt-10">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setPage((p) => p - 1)}
+                disabled={page === 1}
+              >
+                ← Prev
+              </Button>
+
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
+                <Button
+                  key={p}
+                  variant={p === page ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setPage(p)}
+                >
+                  {p}
+                </Button>
+              ))}
+
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setPage((p) => p + 1)}
+                disabled={page === totalPages}
+              >
+                Next →
+              </Button>
+            </div>
+          )}
+        </>
       )}
     </div>
   );

@@ -19,14 +19,14 @@ export async function POST(request: NextRequest) {
     if (!file) {
       return NextResponse.json(
         { error: "File tidak ditemukan" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     if (!category) {
       return NextResponse.json(
         { error: "Kategori tidak ditemukan" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -41,7 +41,7 @@ export async function POST(request: NextRequest) {
     if (!allowedTypes.includes(file.type)) {
       return NextResponse.json(
         { error: "Tipe file tidak didukung" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -49,7 +49,7 @@ export async function POST(request: NextRequest) {
     if (file.size > 5 * 1024 * 1024) {
       return NextResponse.json(
         { error: "Ukuran file terlalu besar (maksimal 5MB)" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -70,9 +70,9 @@ export async function POST(request: NextRequest) {
     await writeFile(filepath, Buffer.from(buffer));
 
     // Return the relative URL path
-    const fileUrl = `/files/${category}/${filename}`;
+    const fileUrl = `/api/files/${category}/${filename}`;
 
-    console.log("[v0] File uploaded successfully:", fileUrl);
+    console.log("File uploaded successfully:", fileUrl);
 
     return NextResponse.json({
       success: true,
@@ -80,10 +80,10 @@ export async function POST(request: NextRequest) {
       filename,
     });
   } catch (error) {
-    console.error("[v0] Upload error:", error);
+    console.error("Upload error:", error);
     return NextResponse.json(
       { error: "Gagal mengunggah file" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

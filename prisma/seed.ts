@@ -9,6 +9,15 @@ const adapter = new PrismaPg({
 const prisma = new PrismaClient({ adapter });
 
 async function main() {
+  console.log("🗑️  Wiping database...");
+
+  await prisma.cashTransaction.deleteMany();
+  await prisma.gallery.deleteMany();
+  await prisma.announcement.deleteMany();
+  await prisma.household.deleteMany();
+  await prisma.homepage.deleteMany();
+  await prisma.user.deleteMany();
+
   console.log("Seeding database...");
 
   // Create default admin user

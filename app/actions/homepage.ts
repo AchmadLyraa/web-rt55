@@ -1,9 +1,9 @@
 "use server";
-
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/auth";
 import { z } from "zod";
 import { revalidatePath } from "next/cache";
+import { deletePublicFile } from "@/lib/file";
 
 const homepageSchema = z.object({
   rtName: z.string().min(1, "Nama RT wajib diisi"),
@@ -21,7 +21,7 @@ export async function getHomepage() {
     const homepage = await prisma.homepage.findUnique({
       where: { id: "default" },
     });
-    // Fetch 4 latest gallery images
+
     const galleryPreview = await prisma.gallery.findMany({
       orderBy: { createdAt: "desc" },
       take: 4,
@@ -32,7 +32,6 @@ export async function getHomepage() {
       },
     });
 
-    // Fetch warga statistics
     const households = await prisma.household.findMany();
     const wargaStats = {
       totalKepalaKeluarga: households.length,
@@ -60,6 +59,28 @@ export async function updateHomepage(data: z.infer<typeof homepageSchema>) {
     await requireAdmin();
     const validated = homepageSchema.parse(data);
 
+    const existing = await prisma.homepage.findUnique({
+      where: { id: "default" },
+    });
+
+    if (existing) {
+      if (
+        existing.heroImageUrl &&
+        existing.heroImageUrl !== validated.heroImageUrl
+      ) {
+        await deletePublicFile(existing.heroImageUrl);
+      }
+      if (
+        existing.ketuaRtPhotoUrl &&
+        existing.ketuaRtPhotoUrl !== validated.ketuaRtPhotoUrl
+      ) {
+        await deletePublicFile(existing.ketuaRtPhotoUrl);
+      }
+      if (existing.bannerUrl && existing.bannerUrl !== validated.bannerUrl) {
+        await deletePublicFile(existing.bannerUrl);
+      }
+    }
+
     const homepage = await prisma.homepage.upsert({
       where: { id: "default" },
       update: validated,
@@ -71,7 +92,6 @@ export async function updateHomepage(data: z.infer<typeof homepageSchema>) {
 
     revalidatePath("/");
     revalidatePath("/admin/homepage");
-
     return { success: true, data: homepage };
   } catch (error) {
     console.error("[v0] Error updating homepage:", error);

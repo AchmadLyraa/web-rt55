@@ -1,9 +1,9 @@
 "use server";
-
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/auth";
 import { z } from "zod";
 import { revalidatePath } from "next/cache";
+import { deletePublicFile } from "@/lib/file";
 
 const gallerySchema = z.object({
   title: z.string().min(1, "Judul wajib diisi"),
@@ -16,6 +16,8 @@ const updateGallerySchema = z.object({
   title: z.string().min(1, "Judul wajib diisi"),
   description: z.string().optional(),
 });
+
+const ITEMS_PER_PAGE = 20;
 
 export async function getGalleries(limit?: number) {
   try {
@@ -34,6 +36,44 @@ export async function getGalleries(limit?: number) {
     return { success: true, data: galleries };
   } catch (error) {
     console.error("[v0] Error getting galleries:", error);
+    return { success: false, error: "Gagal mengambil data galeri" };
+  }
+}
+
+export async function getGalleriesPaginated(page: number = 1) {
+  try {
+    const skip = (page - 1) * ITEMS_PER_PAGE;
+
+    const [galleries, total] = await Promise.all([
+      prisma.gallery.findMany({
+        include: {
+          createdBy: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
+        },
+        orderBy: { createdAt: "desc" },
+        skip,
+        take: ITEMS_PER_PAGE,
+      }),
+      prisma.gallery.count(),
+    ]);
+
+    return {
+      success: true,
+      data: galleries,
+      pagination: {
+        page,
+        totalItems: total,
+        totalPages: Math.ceil(total / ITEMS_PER_PAGE),
+        hasNext: page < Math.ceil(total / ITEMS_PER_PAGE),
+        hasPrev: page > 1,
+      },
+    };
+  } catch (error) {
+    console.error("[v0] Error getting galleries paginated:", error);
     return { success: false, error: "Gagal mengambil data galeri" };
   }
 }
@@ -62,7 +102,6 @@ export async function createGallery(data: z.infer<typeof gallerySchema>) {
   try {
     const session = await requireAdmin();
     const validated = gallerySchema.parse(data);
-
     const gallery = await prisma.gallery.create({
       data: {
         ...validated,
@@ -77,10 +116,9 @@ export async function createGallery(data: z.infer<typeof gallerySchema>) {
         },
       },
     });
-
+    revalidatePath("/");
     revalidatePath("/galeri");
     revalidatePath("/admin/galeri");
-
     return { success: true, data: gallery };
   } catch (error) {
     console.error("[v0] Error creating gallery:", error);
@@ -95,13 +133,15 @@ export async function deleteGallery(id: string) {
   try {
     await requireAdmin();
 
+    const existing = await prisma.gallery.findUnique({ where: { id } });
+    await deletePublicFile(existing?.imageUrl);
+
     const gallery = await prisma.gallery.delete({
       where: { id },
     });
-
+    revalidatePath("/");
     revalidatePath("/galeri");
     revalidatePath("/admin/galeri");
-
     return { success: true, data: gallery };
   } catch (error) {
     console.error("[v0] Error deleting gallery:", error);
@@ -112,9 +152,7 @@ export async function deleteGallery(id: string) {
 export async function updateGallery(data: z.infer<typeof updateGallerySchema>) {
   try {
     await requireAdmin();
-
     const validated = updateGallerySchema.parse(data);
-
     const gallery = await prisma.gallery.update({
       where: { id: validated.id },
       data: {
@@ -123,18 +161,15 @@ export async function updateGallery(data: z.infer<typeof updateGallerySchema>) {
         // ❌ imageUrl sengaja gak disentuh
       },
     });
-
+    revalidatePath("/");
     revalidatePath("/galeri");
     revalidatePath("/admin/galeri");
-
     return { success: true, data: gallery };
   } catch (error) {
     console.error("[v0] Error updating gallery:", error);
-
     if (error instanceof z.ZodError) {
       return { success: false, error: error.errors[0].message };
     }
-
     return { success: false, error: "Gagal update galeri" };
   }
 }

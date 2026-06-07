@@ -2,11 +2,12 @@
 
 import { useState, useEffect } from "react";
 import {
-  getTransactions,
+  getTransactionsPaginated,
   getTransactionSummary,
 } from "@/app/actions/transaction";
 import { format } from "date-fns";
 import { id } from "date-fns/locale";
+import { Button } from "@/components/ui/button";
 
 interface Transaction {
   id: string;
@@ -29,32 +30,36 @@ export default function LaporanPage() {
     balance: 0,
   });
   const [isLoading, setIsLoading] = useState(true);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
   useEffect(() => {
-    async function loadData() {
-      try {
-        console.log("[v0] Loading transactions and summary");
-        const [transResult, sumResult] = await Promise.all([
-          getTransactions(),
-          getTransactionSummary(),
-        ]);
-
-        if (transResult.success) {
-          setTransactions(transResult.data as any);
-        }
-
-        if (sumResult.success) {
-          setSummary(sumResult.data as any);
-        }
-      } catch (error) {
-        console.error("[v0] Error loading data:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    }
-
-    loadData();
+    loadSummary();
   }, []);
+
+  useEffect(() => {
+    loadTransactions(page);
+  }, [page]);
+
+  async function loadSummary() {
+    const sumResult = await getTransactionSummary();
+    if (sumResult.success) setSummary(sumResult.data as any);
+  }
+
+  async function loadTransactions(p: number) {
+    setIsLoading(true);
+    try {
+      const result = await getTransactionsPaginated(p);
+      if (result.success) {
+        setTransactions(result.data as any);
+        setTotalPages(result.pagination.totalPages);
+      }
+    } catch (error) {
+      console.error("[v0] Error loading data:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  }
 
   const formatCurrency = (amount: number | bigint) => {
     return new Intl.NumberFormat("id-ID", {
@@ -66,7 +71,6 @@ export default function LaporanPage() {
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Header - Clean Typography */}
       <div className="pt-28 bg-white relative">
         <div
           className="absolute inset-0 opacity-5"
@@ -89,11 +93,10 @@ export default function LaporanPage() {
           </p>
         </div>
       </div>
-      {/* Content */}
+
       <div className="container mx-auto px-4 py-16">
         {/* Summary Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
-          {/* Pemasukan */}
           <div className="bg-white rounded-lg border border-gray-200 p-8 hover:shadow-lg transition-shadow">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-gray-600 font-semibold">Pemasukan</h3>
@@ -118,7 +121,6 @@ export default function LaporanPage() {
             </p>
           </div>
 
-          {/* Pengeluaran */}
           <div className="bg-white rounded-lg border border-gray-200 p-8 hover:shadow-lg transition-shadow">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-gray-600 font-semibold">Pengeluaran</h3>
@@ -143,19 +145,14 @@ export default function LaporanPage() {
             </p>
           </div>
 
-          {/* Saldo */}
           <div className="bg-white rounded-lg border border-gray-200 p-8 hover:shadow-lg transition-shadow">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-gray-600 font-semibold">Saldo</h3>
               <div
-                className={`w-12 h-12 rounded-lg flex items-center justify-center ${
-                  summary.balance >= 0 ? "bg-blue-100" : "bg-orange-100"
-                }`}
+                className={`w-12 h-12 rounded-lg flex items-center justify-center ${summary.balance >= 0 ? "bg-blue-100" : "bg-orange-100"}`}
               >
                 <svg
-                  className={`w-6 h-6 ${
-                    summary.balance >= 0 ? "text-blue-600" : "text-orange-600"
-                  }`}
+                  className={`w-6 h-6 ${summary.balance >= 0 ? "text-blue-600" : "text-orange-600"}`}
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -170,9 +167,7 @@ export default function LaporanPage() {
               </div>
             </div>
             <p
-              className={`text-3xl font-bold ${
-                summary.balance >= 0 ? "text-blue-600" : "text-orange-600"
-              }`}
+              className={`text-3xl font-bold ${summary.balance >= 0 ? "text-blue-600" : "text-orange-600"}`}
             >
               {formatCurrency(summary.balance)}
             </p>
@@ -202,12 +197,12 @@ export default function LaporanPage() {
                     r="10"
                     stroke="currentColor"
                     strokeWidth="4"
-                  ></circle>
+                  />
                   <path
                     className="opacity-75"
                     fill="currentColor"
                     d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                  ></path>
+                  />
                 </svg>
                 <p className="text-gray-500">Memuat data...</p>
               </div>
@@ -229,81 +224,110 @@ export default function LaporanPage() {
                 <p className="text-gray-500">Belum ada transaksi</p>
               </div>
             ) : (
-              <div className="overflow-x-auto">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="border-b border-gray-200">
-                      <th className="text-left py-4 px-4 font-semibold text-gray-700">
-                        Tanggal
-                      </th>
-                      <th className="text-left py-4 px-4 font-semibold text-gray-700">
-                        Jenis
-                      </th>
-                      <th className="text-left py-4 px-4 font-semibold text-gray-700">
-                        Keterangan
-                      </th>
-                      <th className="text-right py-4 px-4 font-semibold text-gray-700">
-                        Jumlah
-                      </th>
-                      <th className="text-left py-4 px-4 font-semibold text-gray-700">
-                        Oleh
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {transactions.map((trans) => (
-                      <tr
-                        key={trans.id}
-                        className="border-b border-gray-100 hover:bg-gray-50 transition-colors"
-                      >
-                        <td className="py-4 px-4 text-sm text-gray-600">
-                          {format(new Date(trans.date), "d MMM yyyy", {
-                            locale: id,
-                          })}
-                        </td>
-                        <td className="py-4 px-4">
-                          <span
-                            className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
-                              trans.type === "PEMASUKAN"
-                                ? "bg-green-100 text-green-700"
-                                : "bg-red-100 text-red-700"
-                            }`}
-                          >
-                            {trans.type === "PEMASUKAN"
-                              ? "↑ Masuk"
-                              : "↓ Keluar"}
-                          </span>
-                        </td>
-                        <td className="py-4 px-4">
-                          <div>
-                            <p className="font-medium text-gray-900">
-                              {trans.title}
-                            </p>
-                            {trans.description && (
-                              <p className="text-xs text-gray-500 mt-1">
-                                {trans.description}
-                              </p>
-                            )}
-                          </div>
-                        </td>
-                        <td
-                          className={`py-4 px-4 text-right font-semibold ${
-                            trans.type === "PEMASUKAN"
-                              ? "text-green-600"
-                              : "text-red-600"
-                          }`}
-                        >
-                          {trans.type === "PEMASUKAN" ? "+" : "-"}
-                          {formatCurrency(trans.amount)}
-                        </td>
-                        <td className="py-4 px-4 text-sm text-gray-600">
-                          {trans.createdBy.name}
-                        </td>
+              <>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="border-b border-gray-200">
+                        <th className="text-left py-4 px-4 font-semibold text-gray-700">
+                          Tanggal
+                        </th>
+                        <th className="text-left py-4 px-4 font-semibold text-gray-700">
+                          Jenis
+                        </th>
+                        <th className="text-left py-4 px-4 font-semibold text-gray-700">
+                          Keterangan
+                        </th>
+                        <th className="text-right py-4 px-4 font-semibold text-gray-700">
+                          Jumlah
+                        </th>
+                        <th className="text-left py-4 px-4 font-semibold text-gray-700">
+                          Oleh
+                        </th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+                    </thead>
+                    <tbody>
+                      {transactions.map((trans) => (
+                        <tr
+                          key={trans.id}
+                          className="border-b border-gray-100 hover:bg-gray-50 transition-colors"
+                        >
+                          <td className="py-4 px-4 text-sm text-gray-600">
+                            {format(new Date(trans.date), "d MMM yyyy", {
+                              locale: id,
+                            })}
+                          </td>
+                          <td className="py-4 px-4">
+                            <span
+                              className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${trans.type === "PEMASUKAN" ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}`}
+                            >
+                              {trans.type === "PEMASUKAN"
+                                ? "↑ Masuk"
+                                : "↓ Keluar"}
+                            </span>
+                          </td>
+                          <td className="py-4 px-4">
+                            <div>
+                              <p className="font-medium text-gray-900">
+                                {trans.title}
+                              </p>
+                              {trans.description && (
+                                <p className="text-xs text-gray-500 mt-1">
+                                  {trans.description}
+                                </p>
+                              )}
+                            </div>
+                          </td>
+                          <td
+                            className={`py-4 px-4 text-right font-semibold ${trans.type === "PEMASUKAN" ? "text-green-600" : "text-red-600"}`}
+                          >
+                            {trans.type === "PEMASUKAN" ? "+" : "-"}
+                            {formatCurrency(trans.amount)}
+                          </td>
+                          <td className="py-4 px-4 text-sm text-gray-600">
+                            {trans.createdBy.name}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+
+                {totalPages > 1 && (
+                  <div className="flex justify-center items-center gap-2 mt-8">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setPage((p) => p - 1)}
+                      disabled={page === 1}
+                    >
+                      ← Prev
+                    </Button>
+
+                    {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                      (p) => (
+                        <Button
+                          key={p}
+                          variant={p === page ? "default" : "outline"}
+                          size="sm"
+                          onClick={() => setPage(p)}
+                        >
+                          {p}
+                        </Button>
+                      ),
+                    )}
+
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setPage((p) => p + 1)}
+                      disabled={page === totalPages}
+                    >
+                      Next →
+                    </Button>
+                  </div>
+                )}
+              </>
             )}
           </div>
         </div>

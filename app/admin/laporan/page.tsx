@@ -1,18 +1,18 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 import {
-  getTransactions,
+  getTransactionsPaginated,
   getTransactionSummary,
   createTransaction,
   deleteTransaction,
-} from '@/app/actions/transaction';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Textarea } from '@/components/ui/textarea';
-import { format } from 'date-fns';
-import { id } from 'date-fns/locale';
+} from "@/app/actions/transaction";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Textarea } from "@/components/ui/textarea";
+import { format } from "date-fns";
+import { id } from "date-fns/locale";
 
 export default function AdminLaporanPage() {
   const [transactions, setTransactions] = useState<any[]>([]);
@@ -25,35 +25,40 @@ export default function AdminLaporanPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
   const [formData, setFormData] = useState({
-    type: 'PEMASUKAN' as 'PEMASUKAN' | 'PENGELUARAN',
-    title: '',
-    description: '',
-    amount: '',
-    date: format(new Date(), 'yyyy-MM-dd'),
+    type: "PEMASUKAN" as "PEMASUKAN" | "PENGELUARAN",
+    title: "",
+    description: "",
+    amount: "",
+    date: format(new Date(), "yyyy-MM-dd"),
   });
 
   useEffect(() => {
-    loadData();
+    loadSummary();
   }, []);
 
-  async function loadData() {
+  useEffect(() => {
+    loadTransactions(page);
+  }, [page]);
+
+  async function loadSummary() {
+    const sumResult = await getTransactionSummary();
+    if (sumResult.success) setSummary(sumResult.data as any);
+  }
+
+  async function loadTransactions(p: number) {
+    setIsLoading(true);
     try {
-      const [transResult, sumResult] = await Promise.all([
-        getTransactions(),
-        getTransactionSummary(),
-      ]);
-
-      if (transResult.success) {
-        setTransactions(transResult.data);
-      }
-
-      if (sumResult.success) {
-        setSummary(sumResult.data);
+      const result = await getTransactionsPaginated(p);
+      if (result.success) {
+        setTransactions(result.data);
+        setTotalPages(result.pagination.totalPages);
       }
     } catch (err) {
-      console.error('[v0] Error loading data:', err);
+      console.error("[v0] Error loading data:", err);
     } finally {
       setIsLoading(false);
     }
@@ -74,58 +79,49 @@ export default function AdminLaporanPage() {
       });
 
       if (result.success) {
-        setTransactions([result.data, ...transactions]);
+        await loadTransactions(1);
+        await loadSummary();
+        setPage(1);
         setFormData({
-          type: 'PEMASUKAN',
-          title: '',
-          description: '',
-          amount: '',
-          date: format(new Date(), 'yyyy-MM-dd'),
+          type: "PEMASUKAN",
+          title: "",
+          description: "",
+          amount: "",
+          date: format(new Date(), "yyyy-MM-dd"),
         });
         setShowForm(false);
-        
-        // Reload summary
-        const sumResult = await getTransactionSummary();
-        if (sumResult.success) {
-          setSummary(sumResult.data);
-        }
       } else {
-        setError(result.error || 'Gagal menyimpan');
+        setError(result.error || "Gagal menyimpan");
       }
     } catch (err) {
-      console.error('[v0] Error:', err);
-      setError('Terjadi kesalahan');
+      console.error("[v0] Error:", err);
+      setError("Terjadi kesalahan");
     } finally {
       setIsSubmitting(false);
     }
   }
 
-  async function handleDelete(id: string) {
-    if (!confirm('Yakin ingin menghapus transaksi ini?')) return;
+  async function handleDelete(transId: string) {
+    if (!confirm("Yakin ingin menghapus transaksi ini?")) return;
 
     try {
-      const result = await deleteTransaction(id);
+      const result = await deleteTransaction(transId);
       if (result.success) {
-        setTransactions(transactions.filter((t) => t.id !== id));
-        
-        // Reload summary
-        const sumResult = await getTransactionSummary();
-        if (sumResult.success) {
-          setSummary(sumResult.data);
-        }
+        await loadTransactions(page);
+        await loadSummary();
       } else {
-        setError(result.error || 'Gagal menghapus');
+        setError(result.error || "Gagal menghapus");
       }
     } catch (err) {
-      console.error('[v0] Error deleting:', err);
-      setError('Terjadi kesalahan');
+      console.error("[v0] Error deleting:", err);
+      setError("Terjadi kesalahan");
     }
   }
 
   const formatCurrency = (amount: number | bigint) => {
-    return new Intl.NumberFormat('id-ID', {
-      style: 'currency',
-      currency: 'IDR',
+    return new Intl.NumberFormat("id-ID", {
+      style: "currency",
+      currency: "IDR",
       minimumFractionDigits: 0,
     }).format(Number(amount));
   };
@@ -143,10 +139,12 @@ export default function AdminLaporanPage() {
       <div className="mb-8 flex justify-between items-center">
         <div>
           <h1 className="text-4xl font-bold mb-2">Kelola Laporan Keuangan</h1>
-          <p className="text-muted-foreground">Input dan kelola transaksi kas RT</p>
+          <p className="text-muted-foreground">
+            Input dan kelola transaksi kas RT
+          </p>
         </div>
         <Button onClick={() => setShowForm(!showForm)}>
-          {showForm ? 'Batal' : '+ Input Transaksi'}
+          {showForm ? "Batal" : "+ Input Transaksi"}
         </Button>
       </div>
 
@@ -160,7 +158,9 @@ export default function AdminLaporanPage() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
         <Card className="bg-green-950/20 border-green-900/30">
           <CardHeader>
-            <CardTitle className="text-sm text-muted-foreground">Pemasukan</CardTitle>
+            <CardTitle className="text-sm text-muted-foreground">
+              Pemasukan
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-2xl font-bold text-green-400">
@@ -171,7 +171,9 @@ export default function AdminLaporanPage() {
 
         <Card className="bg-red-950/20 border-red-900/30">
           <CardHeader>
-            <CardTitle className="text-sm text-muted-foreground">Pengeluaran</CardTitle>
+            <CardTitle className="text-sm text-muted-foreground">
+              Pengeluaran
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-2xl font-bold text-red-400">
@@ -182,13 +184,13 @@ export default function AdminLaporanPage() {
 
         <Card className="bg-blue-950/20 border-blue-900/30">
           <CardHeader>
-            <CardTitle className="text-sm text-muted-foreground">Saldo</CardTitle>
+            <CardTitle className="text-sm text-muted-foreground">
+              Saldo
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <p
-              className={`text-2xl font-bold ${
-                summary.balance >= 0 ? 'text-blue-400' : 'text-orange-400'
-              }`}
+              className={`text-2xl font-bold ${summary.balance >= 0 ? "text-blue-400" : "text-orange-400"}`}
             >
               {formatCurrency(summary.balance)}
             </p>
@@ -211,7 +213,7 @@ export default function AdminLaporanPage() {
                     onChange={(e) =>
                       setFormData({
                         ...formData,
-                        type: e.target.value as 'PEMASUKAN' | 'PENGELUARAN',
+                        type: e.target.value as "PEMASUKAN" | "PENGELUARAN",
                       })
                     }
                     disabled={isSubmitting}
@@ -277,7 +279,7 @@ export default function AdminLaporanPage() {
               </div>
 
               <Button type="submit" disabled={isSubmitting} className="w-full">
-                {isSubmitting ? 'Menyimpan...' : 'Simpan Transaksi'}
+                {isSubmitting ? "Menyimpan..." : "Simpan Transaksi"}
               </Button>
             </form>
           </CardContent>
@@ -316,19 +318,15 @@ export default function AdminLaporanPage() {
                       className="border-b border-border hover:bg-secondary/30 transition-colors"
                     >
                       <td className="py-3 px-2 text-xs">
-                        {format(new Date(trans.date), 'd MMM yyyy', {
+                        {format(new Date(trans.date), "d MMM yyyy", {
                           locale: id,
                         })}
                       </td>
                       <td className="py-3 px-2">
                         <span
-                          className={`px-2 py-1 rounded text-xs font-medium ${
-                            trans.type === 'PEMASUKAN'
-                              ? 'bg-green-950/30 text-green-400'
-                              : 'bg-red-950/30 text-red-400'
-                          }`}
+                          className={`px-2 py-1 rounded text-xs font-medium ${trans.type === "PEMASUKAN" ? "bg-green-950/30 text-green-400" : "bg-red-950/30 text-red-400"}`}
                         >
-                          {trans.type === 'PEMASUKAN' ? '↑ Masuk' : '↓ Keluar'}
+                          {trans.type === "PEMASUKAN" ? "↑ Masuk" : "↓ Keluar"}
                         </span>
                       </td>
                       <td className="py-3 px-2">
@@ -342,13 +340,9 @@ export default function AdminLaporanPage() {
                         </div>
                       </td>
                       <td
-                        className={`py-3 px-2 font-semibold ${
-                          trans.type === 'PEMASUKAN'
-                            ? 'text-green-400'
-                            : 'text-red-400'
-                        }`}
+                        className={`py-3 px-2 font-semibold ${trans.type === "PEMASUKAN" ? "text-green-400" : "text-red-400"}`}
                       >
-                        {trans.type === 'PEMASUKAN' ? '+' : '-'}
+                        {trans.type === "PEMASUKAN" ? "+" : "-"}
                         {formatCurrency(trans.amount)}
                       </td>
                       <td className="py-3 px-2">
@@ -365,6 +359,41 @@ export default function AdminLaporanPage() {
                 </tbody>
               </table>
             </div>
+
+            {totalPages > 1 && (
+              <div className="flex justify-center items-center gap-2 mt-8">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setPage((p) => p - 1)}
+                  disabled={page === 1}
+                >
+                  ← Prev
+                </Button>
+
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                  (p) => (
+                    <Button
+                      key={p}
+                      variant={p === page ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => setPage(p)}
+                    >
+                      {p}
+                    </Button>
+                  ),
+                )}
+
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setPage((p) => p + 1)}
+                  disabled={page === totalPages}
+                >
+                  Next →
+                </Button>
+              </div>
+            )}
           </CardContent>
         </Card>
       )}
