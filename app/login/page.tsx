@@ -58,7 +58,7 @@ export default function LoginPage() {
               <label className="text-sm font-medium">Email</label>
               <Input
                 type="email"
-                placeholder="admin@rt.local"
+                placeholder="admin@gmail.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
@@ -87,7 +87,7 @@ export default function LoginPage() {
               <br />
               Email: admin@rt.local
               <br />
-              Password: admin123
+              Password: adminrtgunsam123
             </p>
           </form>
         </CardContent>

@@ -9,496 +9,53 @@ const adapter = new PrismaPg({
 const prisma = new PrismaClient({ adapter });
 
 async function main() {
-  const households = [
-    // ── BLOK A ──
-    {
-      nomorRumah: "A1",
-      blok: "A",
-      kepalaKeluarga: "-",
-      koordinat: "-1.237771,116.855088",
-    },
-    {
-      nomorRumah: "A2",
-      blok: "A",
-      kepalaKeluarga: "-",
-      koordinat: "-1.2387662,116.8550528",
-    },
-    {
-      nomorRumah: "A3",
-      blok: "A",
-      namaPemilikRumah: "Lucy Fransisca Sari",
-      kepalaKeluarga: "Lucy Fransisca Sari",
-      jumlahKK: 3,
-      statusWarga: "WARGA_ASLI",
-      koordinat: "-1.2387675,116.8550967",
-    },
-    {
-      nomorRumah: "A4",
-      blok: "A",
-      namaPemilikRumah: "Astari",
-      kepalaKeluarga: "Astari",
-      jumlahKK: 1,
-      statusWarga: "WARGA_ASLI",
-      koordinat: "-1.2387810,116.8551403",
-    },
-    {
-      nomorRumah: "A5",
-      blok: "A",
-      kepalaKeluarga: "-",
-      koordinat: "-1.2387890,116.8552362",
-    },
-    {
-      nomorRumah: "A6",
-      blok: "A",
-      kepalaKeluarga: "-",
-      koordinat: "-1.2388262,116.8552731",
-    },
-    {
-      nomorRumah: "A7",
-      blok: "A",
-      kepalaKeluarga: "-",
-      koordinat: "-1.2388399,116.8553733",
-    },
-    {
-      nomorRumah: "A8",
-      blok: "A",
-      kepalaKeluarga: "-",
-      koordinat: "-1.2388044,116.8554340",
-    },
-    {
-      nomorRumah: "A9",
-      blok: "A",
-      kepalaKeluarga: "-",
-      koordinat: "-1.2388748,116.8555272",
-    },
-    {
-      nomorRumah: "A10",
-      blok: "A",
-      namaPemilikRumah: "Andi Samsul Alam",
-      kepalaKeluarga: "Abdul Wahid",
-      jumlahKK: 1,
-      statusWarga: "WARGA_ASLI",
-      koordinat: "-1.2388916,116.8555531",
-    },
-    {
-      nomorRumah: "A11",
-      blok: "A",
-      kepalaKeluarga: "-",
-      koordinat: "-1.2388906,116.8555306",
-    },
-    {
-      nomorRumah: "A12",
-      blok: "A",
-      kepalaKeluarga: "-",
-      koordinat: "-1.2388292,116.8554773",
-    },
-    {
-      nomorRumah: "A13",
-      blok: "A",
-      kepalaKeluarga: "-",
-      koordinat: "-1.2388738,116.8554404",
-    },
-    {
-      nomorRumah: "A14",
-      blok: "A",
-      kepalaKeluarga: "-",
-      koordinat: "-1.2388098,116.8553073",
-    },
-    {
-      nomorRumah: "A15",
-      blok: "A",
-      kepalaKeluarga: "-",
-      koordinat: "-1.2388058,116.8552275",
-    },
-    {
-      nomorRumah: "A16",
-      blok: "A",
-      kepalaKeluarga: "-",
-      koordinat: "-1.2388202,116.8551591",
-    },
-    {
-      nomorRumah: "A17",
-      blok: "A",
-      namaPemilikRumah: "Joko Harianto",
-      kepalaKeluarga: "Joko Harianto",
-      jumlahKK: 1,
-      statusWarga: "WARGA_ASLI",
-      koordinat: "-1.2387960,116.8551222",
-    },
-    {
-      nomorRumah: "A18",
-      blok: "A",
-      namaPemilikRumah: "Tidak Tau",
-      kepalaKeluarga: "Aditya",
-      jumlahKK: 1,
-      statusWarga: "PENDATANG_KK_LUAR",
-      koordinat: "-1.2387414,116.8549486",
-    },
-    {
-      nomorRumah: "A19",
-      blok: "A",
-      kepalaKeluarga: "-",
-      koordinat: "-1.2386301,116.8549247",
-    },
+  console.log("🗑️  Wiping database...");
 
-    // ── BLOK B ──
-    {
-      nomorRumah: "B1",
-      blok: "B",
-      namaPemilikRumah: "Misbah",
-      kepalaKeluarga: "Misbah",
-      jumlahKK: 1,
-      statusWarga: "WARGA_ASLI",
-      koordinat: "-1.2386003,116.8550076",
-    },
-    {
-      nomorRumah: "B2",
-      blok: "B",
-      kepalaKeluarga: "-",
-      koordinat: "-1.2385443,116.8551387",
-    },
-    {
-      nomorRumah: "B3",
-      blok: "B",
-      namaPemilikRumah: "Dayat",
-      kepalaKeluarga: "Dayat",
-      jumlahKK: 1,
-      statusWarga: "PENDATANG_KK_RT55",
-      koordinat: "-1.2385795,116.8551222",
-    },
-    {
-      nomorRumah: "B4",
-      blok: "B",
-      namaPemilikRumah: "Bambang",
-      kepalaKeluarga: "Bambang",
-      jumlahKK: 1,
-      statusWarga: "WARGA_ASLI",
-      koordinat: "-1.2385916,116.8551497",
-    },
-    {
-      nomorRumah: "B5",
-      blok: "B",
-      namaPemilikRumah: "Nugraha Agus",
-      kepalaKeluarga: "Nugraha Agus",
-      jumlahKK: 1,
-      statusWarga: "WARGA_ASLI",
-      koordinat: "-1.2386157,116.8552429",
-    },
-    {
-      nomorRumah: "B6",
-      blok: "B",
-      namaPemilikRumah: "Teguh Santoso",
-      kepalaKeluarga: "Teguh Santoso",
-      jumlahKK: 1,
-      statusWarga: "PENDATANG_KK_RT55",
-      koordinat: "-1.2386663,116.8553298",
-    },
-    {
-      nomorRumah: "B7",
-      blok: "B",
-      namaPemilikRumah: "Eka Hariyati",
-      kepalaKeluarga: "Eka Hariyati",
-      jumlahKK: 1,
-      statusWarga: "PENDATANG_KK_RT55",
-      koordinat: "-1.2386596,116.8553596",
-    },
-    {
-      nomorRumah: "B8",
-      blok: "B",
-      kepalaKeluarga: "-",
-      koordinat: "-1.2386103,116.8553928",
-    },
-    {
-      nomorRumah: "B9",
-      blok: "B",
-      namaPemilikRumah: "Tidak Tau",
-      kepalaKeluarga: "Pak Kalan",
-      jumlahKK: 2,
-      statusWarga: "PENDATANG_KK_LUAR",
-      koordinat: "-1.2386365,116.8554716",
-    },
+  await prisma.cashTransaction.deleteMany();
+  await prisma.gallery.deleteMany();
+  await prisma.announcement.deleteMany();
+  await prisma.household.deleteMany();
+  await prisma.homepage.deleteMany();
+  await prisma.user.deleteMany();
 
-    // ── BLOK C ──
-    {
-      nomorRumah: "C-2",
-      blok: "C",
-      namaPemilikRumah: "Bapak Jumingun",
-      kepalaKeluarga: "Bapak Amarton",
-      jumlahKK: 2,
-      statusWarga: "PENDATANG_KK_RT55",
-      koordinat: "-1.2383432,116.8550867",
-    },
-    {
-      nomorRumah: "C-3",
-      blok: "C",
-      namaPemilikRumah: "Iwin Rinda",
-      kepalaKeluarga: "Ibu Iwinrindah",
-      jumlahKK: 1,
-      statusWarga: "PENDATANG_KK_LUAR",
-    },
-    {
-      nomorRumah: "C-7",
-      blok: "C",
-      namaPemilikRumah: "Cikal Aldrid",
-      kepalaKeluarga: "Penyewa",
-      jumlahKK: 1,
-      statusWarga: "PENDATANG_KK_LUAR",
-    },
-    {
-      nomorRumah: "C-15",
-      blok: "C",
-      namaPemilikRumah: "Bapak Muhammad Mirhan",
-      kepalaKeluarga: "Bapak Muhammad Mirhan",
-      jumlahKK: 3,
-      statusWarga: "WARGA_ASLI",
-    },
+  console.log("Seeding database...");
 
-    // ── BLOK D ──
-    {
-      nomorRumah: "D-1",
-      blok: "D",
-      namaPemilikRumah: "Andi Muhammad Satria",
-      kepalaKeluarga: "Andi Muhammad Satria",
-      jumlahKK: 2,
-      statusWarga: "WARGA_ASLI",
-      koordinat: "-1.2381387,116.8550364",
-    },
-    {
-      nomorRumah: "D-2",
-      blok: "D",
-      namaPemilikRumah: "Sigit Afrianto",
-      kepalaKeluarga: "Sigit Afrianto",
-      jumlahKK: 1,
-      statusWarga: "WARGA_ASLI",
-    },
+  // Create default admin user
+  const hashedPassword = await bcrypt.hash("adminrtgunsam123", 10);
 
-    // ── BLOK E ──
-    {
-      nomorRumah: "E-1",
-      blok: "E",
-      namaPemilikRumah: "Bp. Jefri Usman",
-      kepalaKeluarga: "Bp. Jefri Usman",
-      jumlahKK: 4,
-      statusWarga: "WARGA_ASLI",
-      koordinat: "-1.2378484,116.8550384",
+  const admin = await prisma.user.upsert({
+    where: { email: "admin@rt.local" },
+    update: {},
+    create: {
+      name: "Admin RT",
+      email: "admin@rt.local",
+      password: hashedPassword,
+      role: "ADMIN",
     },
-    {
-      nomorRumah: "E-2",
-      blok: "E",
-      kepalaKeluarga: "-",
-      statusWarga: "PENDATANG_KK_RT55",
-      koordinat: "-1.2383432,116.8550867",
-    },
-    {
-      nomorRumah: "E-3",
-      blok: "E",
-      namaPemilikRumah: "Bp. Ilhamto",
-      kepalaKeluarga: "Bp. Ilhamto",
-      jumlahKK: 3,
-      statusWarga: "WARGA_ASLI",
-      koordinat: "-1.2378545,116.8552191",
-    },
-    {
-      nomorRumah: "E-4",
-      blok: "E",
-      kepalaKeluarga: "-",
-      koordinat: "-1.2378649,116.8553056",
-    },
-    {
-      nomorRumah: "E-5",
-      blok: "E",
-      kepalaKeluarga: "-",
-      koordinat: "-1.2378672,116.8553556",
-    },
-    {
-      nomorRumah: "E-6",
-      blok: "E",
-      namaPemilikRumah: "Djuwarto",
-      kepalaKeluarga: "Djuwarto",
-      jumlahKK: 2,
-      statusWarga: "WARGA_ASLI",
-      koordinat: "-1.2378592,116.8554676",
-    },
-    {
-      nomorRumah: "E-7",
-      blok: "E",
-      namaPemilikRumah: "Bapak R. Ucu Allpaeruzzabadi",
-      kepalaKeluarga: "Bapak R. Ucu Allpaeruzzabadi",
-      jumlahKK: 5,
-      statusWarga: "PENDATANG_KK_LUAR",
-      koordinat: "-1.2377539,116.8554022",
-    },
-    {
-      nomorRumah: "E-8",
-      blok: "E",
-      namaPemilikRumah: "Bapak R. Ucu Allpaeruzzabadi",
-      kepalaKeluarga: "Bapak R. Ucu Allpaeruzzabadi",
-      jumlahKK: 3,
-      statusWarga: "WARGA_ASLI",
-      koordinat: "-1.2377663,116.8554934",
-    },
-    {
-      nomorRumah: "E-9",
-      blok: "E",
-      kepalaKeluarga: "-",
-      koordinat: "-1.2377663,116.8554934",
-    },
-    {
-      nomorRumah: "E-10",
-      blok: "E",
-      namaPemilikRumah: "A. Suryadi",
-      kepalaKeluarga: "Bp. A. Suryadi",
-      jumlahKK: 4,
-      statusWarga: "PENDATANG_KK_LUAR",
-      koordinat: "-1.2377257,116.8553036",
-    },
-    {
-      nomorRumah: "E-11",
-      blok: "E",
-      namaPemilikRumah: "Bp. Nuhul",
-      kepalaKeluarga: "Bp. Nuhul",
-      jumlahKK: 6,
-      statusWarga: "WARGA_ASLI",
-      koordinat: "-1.2377382,116.8553049",
-    },
-    {
-      nomorRumah: "E-12",
-      blok: "E",
-      namaPemilikRumah: "Mushola Al-Aqsha",
-      kepalaKeluarga: "Roni",
-      jumlahKK: 2,
-      statusWarga: "PENDATANG_KK_LUAR",
-      koordinat: "-1.2377170,116.8551256",
-    },
+  });
 
-    // ── PR CLUSTER GREEN EAST RESIDENCE ──
-    {
-      nomorRumah: "PR-1",
-      blok: "PR",
-      namaPemilikRumah: "Muhammad Hizbullah",
-      kepalaKeluarga: "Muhammad Hizbullah",
-      jumlahKK: 1,
-      statusWarga: "PENDATANG_KK_LUAR",
-      koordinat: "-1.2403624,116.8550853",
-    },
-    {
-      nomorRumah: "PR-2",
-      blok: "PR",
-      namaPemilikRumah: "Nurul Azmi",
-      kepalaKeluarga: "Wais Al Atsari",
-      jumlahKK: 1,
-      statusWarga: "PENDATANG_KK_LUAR",
-      koordinat: "-1.2403604,116.8551665",
-    },
-    {
-      nomorRumah: "PR-3",
-      blok: "PR",
-      namaPemilikRumah: "Alwi",
-      kepalaKeluarga: "Alwi",
-      jumlahKK: 1,
-      statusWarga: "PENDATANG_KK_LUAR",
-      koordinat: "-1.2404375,116.8553549",
-    },
-    {
-      nomorRumah: "PR-4",
-      blok: "PR",
-      namaPemilikRumah: "Andik Dwi Jaya",
-      kepalaKeluarga: "Andik Dwi Jaya",
-      jumlahKK: 1,
-      statusWarga: "WARGA_ASLI",
-      koordinat: "-1.2404489,116.8550394",
-    },
-    {
-      nomorRumah: "PR-5",
-      blok: "PR",
-      namaPemilikRumah: "Safirurrahman",
-      kepalaKeluarga: "Safirurrahman",
-      jumlahKK: 1,
-      statusWarga: "PENDATANG_KK_LUAR",
-      koordinat: "-1.2404512,116.8550810",
-    },
+  console.log("Admin user created/updated:", admin);
 
-    // ── JL. SATU ──
-    {
-      nomorRumah: "2",
-      blok: "Jl. Satu",
-      namaPemilikRumah: "Ibu Rosta",
-      kepalaKeluarga: "Ibu Rosta",
-      jumlahKK: 1,
-      statusWarga: "WARGA_ASLI",
-      koordinat: "-1.2385363,116.8545888",
+  // Create default homepage
+  const homepage = await prisma.homepage.upsert({
+    where: { id: "default" },
+    update: {},
+    create: {
+      id: "default",
+      rtName: "RT 55",
+      sambutan:
+        "Selamat datang di website resmi RT 55. Website ini dibuat untuk memudahkan komunikasi dan berbagi informasi antar warga.",
+      visi: "Menjadi komunitas RT yang solid, transparan, dan sejahtera",
+      misi: "Membangun komunikasi yang baik, transparansi dalam keuangan, dan kepedulian antar warga",
+      bannerUrl: null,
+      heroImageUrl: null, // Akan diupload melalui admin panel
+      ketuaRtName: "Budi Santoso",
+      ketuaRtPhotoUrl: null, // Akan diupload melalui admin panel
     },
-    {
-      nomorRumah: "4",
-      blok: "Jl. Satu",
-      namaPemilikRumah: "Gilang Ramana Putra",
-      kepalaKeluarga: "Gilang Ramana Putra",
-      jumlahKK: 1,
-      statusWarga: "WARGA_ASLI",
-      koordinat: "-1.2385376,116.8545506",
-    },
-    {
-      nomorRumah: "5",
-      blok: "Jl. Satu",
-      namaPemilikRumah: "Dwin Bin Tono",
-      kepalaKeluarga: "Dwin Bin Tono",
-      jumlahKK: 2,
-      statusWarga: "WARGA_ASLI",
-      koordinat: "-1.2384474,116.8544108",
-    },
-    {
-      nomorRumah: "12",
-      blok: "Jl. Satu",
-      namaPemilikRumah: "Guntoro",
-      kepalaKeluarga: "Guntoro",
-      jumlahKK: 2,
-      statusWarga: "WARGA_ASLI",
-      koordinat: "-1.2383190,116.8546243",
-    },
-    {
-      nomorRumah: "14",
-      blok: "Jl. Satu",
-      namaPemilikRumah: "Pak Sigit",
-      kepalaKeluarga: "Pak Sigit",
-      jumlahKK: 1,
-      statusWarga: "PENDATANG_KK_RT55",
-      koordinat: "-1.2374797,116.8544295",
-    },
-    {
-      nomorRumah: "15",
-      blok: "Jl. Satu",
-      namaPemilikRumah: "Pak Kemis",
-      kepalaKeluarga: "Pak Kemis",
-      jumlahKK: 3,
-      statusWarga: "WARGA_ASLI",
-    },
-    {
-      nomorRumah: "17/18",
-      blok: "Jl. Satu",
-      namaPemilikRumah: "Hjh. Nadini",
-      kepalaKeluarga: "Hjh. Nadini",
-      jumlahKK: 1,
-      statusWarga: "WARGA_ASLI",
-      koordinat: "-1.2376121,116.8544228",
-    },
-  ];
+  });
 
-  for (const h of households) {
-    await prisma.household.create({
-      data: {
-        nomorRumah: h.nomorRumah,
-        blok: h.blok,
-        namaPemilikRumah: h.namaPemilikRumah ?? null,
-        kepalaKeluarga: h.kepalaKeluarga,
-        jumlahKK: h.jumlahKK ?? 1,
-        statusWarga: (h.statusWarga ?? "WARGA_ASLI") as any,
-        noTelepon: null,
-        fotoRumah: null,
-        koordinat: h.koordinat ?? null,
-      },
-    });
-  }
-  console.log(`✅ Households created: ${households.length}`);
+  console.log("Homepage created/updated:", homepage);
+  console.log("Seeding completed!");
 }
 
 main()
