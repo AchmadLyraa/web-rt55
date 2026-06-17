@@ -23,3 +23,12 @@ export const TransactionType = {
 } as const
 
 export type TransactionType = (typeof TransactionType)[keyof typeof TransactionType]
+
+
+export const StatusWarga = {
+  WARGA_ASLI: 'WARGA_ASLI',
+  PENDATANG_KK_RT55: 'PENDATANG_KK_RT55',
+  PENDATANG_KK_LUAR: 'PENDATANG_KK_LUAR'
+} as const
+
+export type StatusWarga = (typeof StatusWarga)[keyof typeof StatusWarga]

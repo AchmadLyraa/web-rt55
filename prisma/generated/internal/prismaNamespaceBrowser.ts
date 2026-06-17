@@ -147,12 +147,15 @@ export type CashTransactionScalarFieldEnum = (typeof CashTransactionScalarFieldE
 
 export const HouseholdScalarFieldEnum = {
   id: 'id',
-  kepalaKeluargaNama: 'kepalaKeluargaNama',
   nomorRumah: 'nomorRumah',
+  namaPemilikRumah: 'namaPemilikRumah',
+  kepalaKeluarga: 'kepalaKeluarga',
+  jumlahKK: 'jumlahKK',
+  statusWarga: 'statusWarga',
   noTelepon: 'noTelepon',
-  totalLakiLaki: 'totalLakiLaki',
-  totalPerempuan: 'totalPerempuan',
-  totalKendaraan: 'totalKendaraan',
+  fotoRumah: 'fotoRumah',
+  koordinat: 'koordinat',
+  blok: 'blok',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const

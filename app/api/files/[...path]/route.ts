@@ -2,12 +2,22 @@ import { NextRequest, NextResponse } from "next/server";
 import { readFile } from "fs/promises";
 import { join } from "path";
 import { existsSync } from "fs";
+import { auth } from "@/auth";
 
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ path: string[] }> },
 ) {
   const { path } = await params;
+
+  // Restrict folder household — hanya admin
+  if (path[0] === "household") {
+    const session = await auth();
+    if (!session || session.user.role !== "ADMIN") {
+      return new NextResponse("Unauthorized", { status: 401 });
+    }
+  }
+
   const filePath = join(process.cwd(), "public", "files", ...path);
 
   if (!existsSync(filePath)) {

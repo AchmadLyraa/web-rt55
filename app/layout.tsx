@@ -8,16 +8,12 @@ const _geist = Geist({ subsets: ["latin"] });
 const _geistMono = Geist_Mono({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "RT 55 - Website Resmi",
+  title: "RT 55 - Gunung Samarinda",
   description:
     "Website resmi Rukun Tetangga 55 untuk komunikasi dan informasi warga",
   icons: {
-    icon: [
-      { url: "/icon-light-32x32.png", media: "(prefers-color-scheme: light)" },
-      { url: "/icon-dark-32x32.png", media: "(prefers-color-scheme: dark)" },
-      { url: "/icon.svg", type: "image/svg+xml" },
-    ],
-    apple: "/apple-icon.png",
+    icon: "/logo.png",
+    apple: "/logo.png",
   },
 };
 

@@ -32,12 +32,20 @@ export async function getHomepage() {
       },
     });
 
-    const households = await prisma.household.findMany();
+    const households = await prisma.household.findMany({
+      select: { statusWarga: true },
+    });
+
     const wargaStats = {
-      totalKepalaKeluarga: households.length,
-      totalLakiLaki: households.reduce((sum, h) => sum + h.totalLakiLaki, 0),
-      totalPerempuan: households.reduce((sum, h) => sum + h.totalPerempuan, 0),
       totalRumah: households.length,
+      totalWargaAsli: households.filter((h) => h.statusWarga === "WARGA_ASLI")
+        .length,
+      totalPendatangRT55: households.filter(
+        (h) => h.statusWarga === "PENDATANG_KK_RT55",
+      ).length,
+      totalPendatangLuar: households.filter(
+        (h) => h.statusWarga === "PENDATANG_KK_LUAR",
+      ).length,
     };
 
     return {
@@ -49,7 +57,7 @@ export async function getHomepage() {
       },
     };
   } catch (error) {
-    console.error("[v0] Error getting homepage:", error);
+    console.error("Error getting homepage:", error);
     return { success: false, error: "Gagal mengambil data homepage" };
   }
 }
@@ -94,7 +102,7 @@ export async function updateHomepage(data: z.infer<typeof homepageSchema>) {
     revalidatePath("/admin/homepage");
     return { success: true, data: homepage };
   } catch (error) {
-    console.error("[v0] Error updating homepage:", error);
+    console.error("Error updating homepage:", error);
     if (error instanceof z.ZodError) {
       return { success: false, error: error.errors[0].message };
     }

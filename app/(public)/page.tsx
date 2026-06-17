@@ -21,10 +21,10 @@ export default async function HomePage() {
           homepage: null,
           galleryPreview: [],
           wargaStats: {
-            totalKepalaKeluarga: 0,
-            totalLakiLaki: 0,
-            totalPerempuan: 0,
             totalRumah: 0,
+            totalWargaAsli: 0,
+            totalPendatangRT55: 0,
+            totalPendatangLuar: 0,
           },
         };
 
@@ -212,28 +212,28 @@ export default async function HomePage() {
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 {[
                   {
-                    value: wargaStats.totalKepalaKeluarga,
-                    label: "Kepala Keluarga",
+                    value: wargaStats.totalRumah,
+                    label: "Total Rumah",
                     icon: Home,
                     color: "text-blue-400",
                   },
                   {
-                    value: wargaStats.totalLakiLaki,
-                    label: "Laki-laki",
+                    value: wargaStats.totalWargaAsli,
+                    label: "Warga KK Asli",
                     icon: Users,
                     color: "text-green-400",
                   },
                   {
-                    value: wargaStats.totalPerempuan,
-                    label: "Perempuan",
-                    icon: Heart,
-                    color: "text-pink-400",
+                    value: wargaStats.totalPendatangRT55,
+                    label: "Pendatang KK RT 55",
+                    icon: UserCheck,
+                    color: "text-yellow-400",
                   },
                   {
-                    value: wargaStats.totalRumah,
-                    label: "Rumah",
-                    icon: Home,
-                    color: "text-orange-400",
+                    value: wargaStats.totalPendatangLuar,
+                    label: "Pendatang KK Luar",
+                    icon: Heart,
+                    color: "text-pink-400",
                   },
                 ].map((stat) => (
                   <div

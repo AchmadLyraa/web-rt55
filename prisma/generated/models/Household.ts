@@ -27,49 +27,54 @@ export type AggregateHousehold = {
 }
 
 export type HouseholdAvgAggregateOutputType = {
-  totalLakiLaki: number | null
-  totalPerempuan: number | null
-  totalKendaraan: number | null
+  jumlahKK: number | null
 }
 
 export type HouseholdSumAggregateOutputType = {
-  totalLakiLaki: number | null
-  totalPerempuan: number | null
-  totalKendaraan: number | null
+  jumlahKK: number | null
 }
 
 export type HouseholdMinAggregateOutputType = {
   id: string | null
-  kepalaKeluargaNama: string | null
   nomorRumah: string | null
+  namaPemilikRumah: string | null
+  kepalaKeluarga: string | null
+  jumlahKK: number | null
+  statusWarga: $Enums.StatusWarga | null
   noTelepon: string | null
-  totalLakiLaki: number | null
-  totalPerempuan: number | null
-  totalKendaraan: number | null
+  fotoRumah: string | null
+  koordinat: string | null
+  blok: string | null
   createdAt: Date | null
   updatedAt: Date | null
 }
 
 export type HouseholdMaxAggregateOutputType = {
   id: string | null
-  kepalaKeluargaNama: string | null
   nomorRumah: string | null
+  namaPemilikRumah: string | null
+  kepalaKeluarga: string | null
+  jumlahKK: number | null
+  statusWarga: $Enums.StatusWarga | null
   noTelepon: string | null
-  totalLakiLaki: number | null
-  totalPerempuan: number | null
-  totalKendaraan: number | null
+  fotoRumah: string | null
+  koordinat: string | null
+  blok: string | null
   createdAt: Date | null
   updatedAt: Date | null
 }
 
 export type HouseholdCountAggregateOutputType = {
   id: number
-  kepalaKeluargaNama: number
   nomorRumah: number
+  namaPemilikRumah: number
+  kepalaKeluarga: number
+  jumlahKK: number
+  statusWarga: number
   noTelepon: number
-  totalLakiLaki: number
-  totalPerempuan: number
-  totalKendaraan: number
+  fotoRumah: number
+  koordinat: number
+  blok: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -77,49 +82,54 @@ export type HouseholdCountAggregateOutputType = {
 
 
 export type HouseholdAvgAggregateInputType = {
-  totalLakiLaki?: true
-  totalPerempuan?: true
-  totalKendaraan?: true
+  jumlahKK?: true
 }
 
 export type HouseholdSumAggregateInputType = {
-  totalLakiLaki?: true
-  totalPerempuan?: true
-  totalKendaraan?: true
+  jumlahKK?: true
 }
 
 export type HouseholdMinAggregateInputType = {
   id?: true
-  kepalaKeluargaNama?: true
   nomorRumah?: true
+  namaPemilikRumah?: true
+  kepalaKeluarga?: true
+  jumlahKK?: true
+  statusWarga?: true
   noTelepon?: true
-  totalLakiLaki?: true
-  totalPerempuan?: true
-  totalKendaraan?: true
+  fotoRumah?: true
+  koordinat?: true
+  blok?: true
   createdAt?: true
   updatedAt?: true
 }
 
 export type HouseholdMaxAggregateInputType = {
   id?: true
-  kepalaKeluargaNama?: true
   nomorRumah?: true
+  namaPemilikRumah?: true
+  kepalaKeluarga?: true
+  jumlahKK?: true
+  statusWarga?: true
   noTelepon?: true
-  totalLakiLaki?: true
-  totalPerempuan?: true
-  totalKendaraan?: true
+  fotoRumah?: true
+  koordinat?: true
+  blok?: true
   createdAt?: true
   updatedAt?: true
 }
 
 export type HouseholdCountAggregateInputType = {
   id?: true
-  kepalaKeluargaNama?: true
   nomorRumah?: true
+  namaPemilikRumah?: true
+  kepalaKeluarga?: true
+  jumlahKK?: true
+  statusWarga?: true
   noTelepon?: true
-  totalLakiLaki?: true
-  totalPerempuan?: true
-  totalKendaraan?: true
+  fotoRumah?: true
+  koordinat?: true
+  blok?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -213,12 +223,15 @@ export type HouseholdGroupByArgs<ExtArgs extends runtime.Types.Extensions.Intern
 
 export type HouseholdGroupByOutputType = {
   id: string
-  kepalaKeluargaNama: string
   nomorRumah: string | null
+  namaPemilikRumah: string | null
+  kepalaKeluarga: string
+  jumlahKK: number
+  statusWarga: $Enums.StatusWarga
   noTelepon: string | null
-  totalLakiLaki: number
-  totalPerempuan: number
-  totalKendaraan: number
+  fotoRumah: string | null
+  koordinat: string | null
+  blok: string | null
   createdAt: Date
   updatedAt: Date
   _count: HouseholdCountAggregateOutputType | null
@@ -248,24 +261,30 @@ export type HouseholdWhereInput = {
   OR?: Prisma.HouseholdWhereInput[]
   NOT?: Prisma.HouseholdWhereInput | Prisma.HouseholdWhereInput[]
   id?: Prisma.StringFilter<"Household"> | string
-  kepalaKeluargaNama?: Prisma.StringFilter<"Household"> | string
   nomorRumah?: Prisma.StringNullableFilter<"Household"> | string | null
+  namaPemilikRumah?: Prisma.StringNullableFilter<"Household"> | string | null
+  kepalaKeluarga?: Prisma.StringFilter<"Household"> | string
+  jumlahKK?: Prisma.IntFilter<"Household"> | number
+  statusWarga?: Prisma.EnumStatusWargaFilter<"Household"> | $Enums.StatusWarga
   noTelepon?: Prisma.StringNullableFilter<"Household"> | string | null
-  totalLakiLaki?: Prisma.IntFilter<"Household"> | number
-  totalPerempuan?: Prisma.IntFilter<"Household"> | number
-  totalKendaraan?: Prisma.IntFilter<"Household"> | number
+  fotoRumah?: Prisma.StringNullableFilter<"Household"> | string | null
+  koordinat?: Prisma.StringNullableFilter<"Household"> | string | null
+  blok?: Prisma.StringNullableFilter<"Household"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Household"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Household"> | Date | string
 }
 
 export type HouseholdOrderByWithRelationInput = {
   id?: Prisma.SortOrder
-  kepalaKeluargaNama?: Prisma.SortOrder
   nomorRumah?: Prisma.SortOrderInput | Prisma.SortOrder
+  namaPemilikRumah?: Prisma.SortOrderInput | Prisma.SortOrder
+  kepalaKeluarga?: Prisma.SortOrder
+  jumlahKK?: Prisma.SortOrder
+  statusWarga?: Prisma.SortOrder
   noTelepon?: Prisma.SortOrderInput | Prisma.SortOrder
-  totalLakiLaki?: Prisma.SortOrder
-  totalPerempuan?: Prisma.SortOrder
-  totalKendaraan?: Prisma.SortOrder
+  fotoRumah?: Prisma.SortOrderInput | Prisma.SortOrder
+  koordinat?: Prisma.SortOrderInput | Prisma.SortOrder
+  blok?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -275,24 +294,30 @@ export type HouseholdWhereUniqueInput = Prisma.AtLeast<{
   AND?: Prisma.HouseholdWhereInput | Prisma.HouseholdWhereInput[]
   OR?: Prisma.HouseholdWhereInput[]
   NOT?: Prisma.HouseholdWhereInput | Prisma.HouseholdWhereInput[]
-  kepalaKeluargaNama?: Prisma.StringFilter<"Household"> | string
   nomorRumah?: Prisma.StringNullableFilter<"Household"> | string | null
+  namaPemilikRumah?: Prisma.StringNullableFilter<"Household"> | string | null
+  kepalaKeluarga?: Prisma.StringFilter<"Household"> | string
+  jumlahKK?: Prisma.IntFilter<"Household"> | number
+  statusWarga?: Prisma.EnumStatusWargaFilter<"Household"> | $Enums.StatusWarga
   noTelepon?: Prisma.StringNullableFilter<"Household"> | string | null
-  totalLakiLaki?: Prisma.IntFilter<"Household"> | number
-  totalPerempuan?: Prisma.IntFilter<"Household"> | number
-  totalKendaraan?: Prisma.IntFilter<"Household"> | number
+  fotoRumah?: Prisma.StringNullableFilter<"Household"> | string | null
+  koordinat?: Prisma.StringNullableFilter<"Household"> | string | null
+  blok?: Prisma.StringNullableFilter<"Household"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Household"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Household"> | Date | string
 }, "id">
 
 export type HouseholdOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
-  kepalaKeluargaNama?: Prisma.SortOrder
   nomorRumah?: Prisma.SortOrderInput | Prisma.SortOrder
+  namaPemilikRumah?: Prisma.SortOrderInput | Prisma.SortOrder
+  kepalaKeluarga?: Prisma.SortOrder
+  jumlahKK?: Prisma.SortOrder
+  statusWarga?: Prisma.SortOrder
   noTelepon?: Prisma.SortOrderInput | Prisma.SortOrder
-  totalLakiLaki?: Prisma.SortOrder
-  totalPerempuan?: Prisma.SortOrder
-  totalKendaraan?: Prisma.SortOrder
+  fotoRumah?: Prisma.SortOrderInput | Prisma.SortOrder
+  koordinat?: Prisma.SortOrderInput | Prisma.SortOrder
+  blok?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.HouseholdCountOrderByAggregateInput
@@ -307,146 +332,175 @@ export type HouseholdScalarWhereWithAggregatesInput = {
   OR?: Prisma.HouseholdScalarWhereWithAggregatesInput[]
   NOT?: Prisma.HouseholdScalarWhereWithAggregatesInput | Prisma.HouseholdScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"Household"> | string
-  kepalaKeluargaNama?: Prisma.StringWithAggregatesFilter<"Household"> | string
   nomorRumah?: Prisma.StringNullableWithAggregatesFilter<"Household"> | string | null
+  namaPemilikRumah?: Prisma.StringNullableWithAggregatesFilter<"Household"> | string | null
+  kepalaKeluarga?: Prisma.StringWithAggregatesFilter<"Household"> | string
+  jumlahKK?: Prisma.IntWithAggregatesFilter<"Household"> | number
+  statusWarga?: Prisma.EnumStatusWargaWithAggregatesFilter<"Household"> | $Enums.StatusWarga
   noTelepon?: Prisma.StringNullableWithAggregatesFilter<"Household"> | string | null
-  totalLakiLaki?: Prisma.IntWithAggregatesFilter<"Household"> | number
-  totalPerempuan?: Prisma.IntWithAggregatesFilter<"Household"> | number
-  totalKendaraan?: Prisma.IntWithAggregatesFilter<"Household"> | number
+  fotoRumah?: Prisma.StringNullableWithAggregatesFilter<"Household"> | string | null
+  koordinat?: Prisma.StringNullableWithAggregatesFilter<"Household"> | string | null
+  blok?: Prisma.StringNullableWithAggregatesFilter<"Household"> | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Household"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Household"> | Date | string
 }
 
 export type HouseholdCreateInput = {
   id?: string
-  kepalaKeluargaNama: string
   nomorRumah?: string | null
+  namaPemilikRumah?: string | null
+  kepalaKeluarga: string
+  jumlahKK?: number
+  statusWarga?: $Enums.StatusWarga
   noTelepon?: string | null
-  totalLakiLaki?: number
-  totalPerempuan?: number
-  totalKendaraan?: number
+  fotoRumah?: string | null
+  koordinat?: string | null
+  blok?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
 
 export type HouseholdUncheckedCreateInput = {
   id?: string
-  kepalaKeluargaNama: string
   nomorRumah?: string | null
+  namaPemilikRumah?: string | null
+  kepalaKeluarga: string
+  jumlahKK?: number
+  statusWarga?: $Enums.StatusWarga
   noTelepon?: string | null
-  totalLakiLaki?: number
-  totalPerempuan?: number
-  totalKendaraan?: number
+  fotoRumah?: string | null
+  koordinat?: string | null
+  blok?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
 
 export type HouseholdUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  kepalaKeluargaNama?: Prisma.StringFieldUpdateOperationsInput | string
   nomorRumah?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  namaPemilikRumah?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  kepalaKeluarga?: Prisma.StringFieldUpdateOperationsInput | string
+  jumlahKK?: Prisma.IntFieldUpdateOperationsInput | number
+  statusWarga?: Prisma.EnumStatusWargaFieldUpdateOperationsInput | $Enums.StatusWarga
   noTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  totalLakiLaki?: Prisma.IntFieldUpdateOperationsInput | number
-  totalPerempuan?: Prisma.IntFieldUpdateOperationsInput | number
-  totalKendaraan?: Prisma.IntFieldUpdateOperationsInput | number
+  fotoRumah?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  koordinat?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  blok?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type HouseholdUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  kepalaKeluargaNama?: Prisma.StringFieldUpdateOperationsInput | string
   nomorRumah?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  namaPemilikRumah?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  kepalaKeluarga?: Prisma.StringFieldUpdateOperationsInput | string
+  jumlahKK?: Prisma.IntFieldUpdateOperationsInput | number
+  statusWarga?: Prisma.EnumStatusWargaFieldUpdateOperationsInput | $Enums.StatusWarga
   noTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  totalLakiLaki?: Prisma.IntFieldUpdateOperationsInput | number
-  totalPerempuan?: Prisma.IntFieldUpdateOperationsInput | number
-  totalKendaraan?: Prisma.IntFieldUpdateOperationsInput | number
+  fotoRumah?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  koordinat?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  blok?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type HouseholdCreateManyInput = {
   id?: string
-  kepalaKeluargaNama: string
   nomorRumah?: string | null
+  namaPemilikRumah?: string | null
+  kepalaKeluarga: string
+  jumlahKK?: number
+  statusWarga?: $Enums.StatusWarga
   noTelepon?: string | null
-  totalLakiLaki?: number
-  totalPerempuan?: number
-  totalKendaraan?: number
+  fotoRumah?: string | null
+  koordinat?: string | null
+  blok?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
 
 export type HouseholdUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  kepalaKeluargaNama?: Prisma.StringFieldUpdateOperationsInput | string
   nomorRumah?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  namaPemilikRumah?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  kepalaKeluarga?: Prisma.StringFieldUpdateOperationsInput | string
+  jumlahKK?: Prisma.IntFieldUpdateOperationsInput | number
+  statusWarga?: Prisma.EnumStatusWargaFieldUpdateOperationsInput | $Enums.StatusWarga
   noTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  totalLakiLaki?: Prisma.IntFieldUpdateOperationsInput | number
-  totalPerempuan?: Prisma.IntFieldUpdateOperationsInput | number
-  totalKendaraan?: Prisma.IntFieldUpdateOperationsInput | number
+  fotoRumah?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  koordinat?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  blok?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type HouseholdUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  kepalaKeluargaNama?: Prisma.StringFieldUpdateOperationsInput | string
   nomorRumah?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  namaPemilikRumah?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  kepalaKeluarga?: Prisma.StringFieldUpdateOperationsInput | string
+  jumlahKK?: Prisma.IntFieldUpdateOperationsInput | number
+  statusWarga?: Prisma.EnumStatusWargaFieldUpdateOperationsInput | $Enums.StatusWarga
   noTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  totalLakiLaki?: Prisma.IntFieldUpdateOperationsInput | number
-  totalPerempuan?: Prisma.IntFieldUpdateOperationsInput | number
-  totalKendaraan?: Prisma.IntFieldUpdateOperationsInput | number
+  fotoRumah?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  koordinat?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  blok?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type HouseholdCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
-  kepalaKeluargaNama?: Prisma.SortOrder
   nomorRumah?: Prisma.SortOrder
+  namaPemilikRumah?: Prisma.SortOrder
+  kepalaKeluarga?: Prisma.SortOrder
+  jumlahKK?: Prisma.SortOrder
+  statusWarga?: Prisma.SortOrder
   noTelepon?: Prisma.SortOrder
-  totalLakiLaki?: Prisma.SortOrder
-  totalPerempuan?: Prisma.SortOrder
-  totalKendaraan?: Prisma.SortOrder
+  fotoRumah?: Prisma.SortOrder
+  koordinat?: Prisma.SortOrder
+  blok?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
 
 export type HouseholdAvgOrderByAggregateInput = {
-  totalLakiLaki?: Prisma.SortOrder
-  totalPerempuan?: Prisma.SortOrder
-  totalKendaraan?: Prisma.SortOrder
+  jumlahKK?: Prisma.SortOrder
 }
 
 export type HouseholdMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
-  kepalaKeluargaNama?: Prisma.SortOrder
   nomorRumah?: Prisma.SortOrder
+  namaPemilikRumah?: Prisma.SortOrder
+  kepalaKeluarga?: Prisma.SortOrder
+  jumlahKK?: Prisma.SortOrder
+  statusWarga?: Prisma.SortOrder
   noTelepon?: Prisma.SortOrder
-  totalLakiLaki?: Prisma.SortOrder
-  totalPerempuan?: Prisma.SortOrder
-  totalKendaraan?: Prisma.SortOrder
+  fotoRumah?: Prisma.SortOrder
+  koordinat?: Prisma.SortOrder
+  blok?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
 
 export type HouseholdMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
-  kepalaKeluargaNama?: Prisma.SortOrder
   nomorRumah?: Prisma.SortOrder
+  namaPemilikRumah?: Prisma.SortOrder
+  kepalaKeluarga?: Prisma.SortOrder
+  jumlahKK?: Prisma.SortOrder
+  statusWarga?: Prisma.SortOrder
   noTelepon?: Prisma.SortOrder
-  totalLakiLaki?: Prisma.SortOrder
-  totalPerempuan?: Prisma.SortOrder
-  totalKendaraan?: Prisma.SortOrder
+  fotoRumah?: Prisma.SortOrder
+  koordinat?: Prisma.SortOrder
+  blok?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
 
 export type HouseholdSumOrderByAggregateInput = {
-  totalLakiLaki?: Prisma.SortOrder
-  totalPerempuan?: Prisma.SortOrder
-  totalKendaraan?: Prisma.SortOrder
+  jumlahKK?: Prisma.SortOrder
 }
 
 export type IntFieldUpdateOperationsInput = {
@@ -457,69 +511,88 @@ export type IntFieldUpdateOperationsInput = {
   divide?: number
 }
 
+export type EnumStatusWargaFieldUpdateOperationsInput = {
+  set?: $Enums.StatusWarga
+}
+
 
 
 export type HouseholdSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
-  kepalaKeluargaNama?: boolean
   nomorRumah?: boolean
+  namaPemilikRumah?: boolean
+  kepalaKeluarga?: boolean
+  jumlahKK?: boolean
+  statusWarga?: boolean
   noTelepon?: boolean
-  totalLakiLaki?: boolean
-  totalPerempuan?: boolean
-  totalKendaraan?: boolean
+  fotoRumah?: boolean
+  koordinat?: boolean
+  blok?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }, ExtArgs["result"]["household"]>
 
 export type HouseholdSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
-  kepalaKeluargaNama?: boolean
   nomorRumah?: boolean
+  namaPemilikRumah?: boolean
+  kepalaKeluarga?: boolean
+  jumlahKK?: boolean
+  statusWarga?: boolean
   noTelepon?: boolean
-  totalLakiLaki?: boolean
-  totalPerempuan?: boolean
-  totalKendaraan?: boolean
+  fotoRumah?: boolean
+  koordinat?: boolean
+  blok?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }, ExtArgs["result"]["household"]>
 
 export type HouseholdSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
-  kepalaKeluargaNama?: boolean
   nomorRumah?: boolean
+  namaPemilikRumah?: boolean
+  kepalaKeluarga?: boolean
+  jumlahKK?: boolean
+  statusWarga?: boolean
   noTelepon?: boolean
-  totalLakiLaki?: boolean
-  totalPerempuan?: boolean
-  totalKendaraan?: boolean
+  fotoRumah?: boolean
+  koordinat?: boolean
+  blok?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }, ExtArgs["result"]["household"]>
 
 export type HouseholdSelectScalar = {
   id?: boolean
-  kepalaKeluargaNama?: boolean
   nomorRumah?: boolean
+  namaPemilikRumah?: boolean
+  kepalaKeluarga?: boolean
+  jumlahKK?: boolean
+  statusWarga?: boolean
   noTelepon?: boolean
-  totalLakiLaki?: boolean
-  totalPerempuan?: boolean
-  totalKendaraan?: boolean
+  fotoRumah?: boolean
+  koordinat?: boolean
+  blok?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type HouseholdOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "kepalaKeluargaNama" | "nomorRumah" | "noTelepon" | "totalLakiLaki" | "totalPerempuan" | "totalKendaraan" | "createdAt" | "updatedAt", ExtArgs["result"]["household"]>
+export type HouseholdOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "nomorRumah" | "namaPemilikRumah" | "kepalaKeluarga" | "jumlahKK" | "statusWarga" | "noTelepon" | "fotoRumah" | "koordinat" | "blok" | "createdAt" | "updatedAt", ExtArgs["result"]["household"]>
 
 export type $HouseholdPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Household"
   objects: {}
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
-    kepalaKeluargaNama: string
     nomorRumah: string | null
+    namaPemilikRumah: string | null
+    kepalaKeluarga: string
+    jumlahKK: number
+    statusWarga: $Enums.StatusWarga
     noTelepon: string | null
-    totalLakiLaki: number
-    totalPerempuan: number
-    totalKendaraan: number
+    fotoRumah: string | null
+    koordinat: string | null
+    blok: string | null
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["household"]>
@@ -946,12 +1019,15 @@ export interface Prisma__HouseholdClient<T, Null = never, ExtArgs extends runtim
  */
 export interface HouseholdFieldRefs {
   readonly id: Prisma.FieldRef<"Household", 'String'>
-  readonly kepalaKeluargaNama: Prisma.FieldRef<"Household", 'String'>
   readonly nomorRumah: Prisma.FieldRef<"Household", 'String'>
+  readonly namaPemilikRumah: Prisma.FieldRef<"Household", 'String'>
+  readonly kepalaKeluarga: Prisma.FieldRef<"Household", 'String'>
+  readonly jumlahKK: Prisma.FieldRef<"Household", 'Int'>
+  readonly statusWarga: Prisma.FieldRef<"Household", 'StatusWarga'>
   readonly noTelepon: Prisma.FieldRef<"Household", 'String'>
-  readonly totalLakiLaki: Prisma.FieldRef<"Household", 'Int'>
-  readonly totalPerempuan: Prisma.FieldRef<"Household", 'Int'>
-  readonly totalKendaraan: Prisma.FieldRef<"Household", 'Int'>
+  readonly fotoRumah: Prisma.FieldRef<"Household", 'String'>
+  readonly koordinat: Prisma.FieldRef<"Household", 'String'>
+  readonly blok: Prisma.FieldRef<"Household", 'String'>
   readonly createdAt: Prisma.FieldRef<"Household", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Household", 'DateTime'>
 }

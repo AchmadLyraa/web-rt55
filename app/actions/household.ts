@@ -1,76 +1,63 @@
 "use server";
-
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/auth";
 import { z } from "zod";
 import { revalidatePath } from "next/cache";
+import { deletePublicFile } from "@/lib/file";
 
 const householdSchema = z.object({
-  kepalaKeluargaNama: z.string().min(1, "Nama kepala keluarga wajib diisi"),
   nomorRumah: z.string().optional(),
+  namaPemilikRumah: z.string().optional(),
+  kepalaKeluarga: z.string().min(1, "Nama kepala keluarga wajib diisi"),
+  jumlahKK: z.number().int().min(1, "Jumlah KK minimal 1"),
+  statusWarga: z.enum(["WARGA_ASLI", "PENDATANG_KK_RT55", "PENDATANG_KK_LUAR"]),
   noTelepon: z.string().optional(),
-  totalLakiLaki: z.number().int().min(0, "Total laki-laki minimal 0"),
-  totalPerempuan: z.number().int().min(0, "Total perempuan minimal 0"),
-  totalKendaraan: z.number().int().min(0, "Total kendaraan minimal 0"),
+  fotoRumah: z.string().optional(),
+  koordinat: z.string().optional(),
+  blok: z.string().optional(),
 });
 
-// Get all households (admin only)
-export async function getHouseholds() {
-  try {
-    const households = await prisma.household.findMany({
-      orderBy: { createdAt: "desc" },
-    });
-
-    return { success: true, data: households };
-  } catch (error) {
-    console.error("[v0] Error fetching households:", error);
-    return { success: false, error: "Gagal mengambil data warga" };
-  }
-}
-
-// Get warga statistics for homepage
 export async function getWargaStatistics() {
   try {
-    const households = await prisma.household.findMany();
+    const [totalRumah, totalWargaAsli, totalPendatangRT55, totalPendatangLuar] =
+      await Promise.all([
+        prisma.household.count(),
+        prisma.household.count({ where: { statusWarga: "WARGA_ASLI" } }),
+        prisma.household.count({ where: { statusWarga: "PENDATANG_KK_RT55" } }),
+        prisma.household.count({ where: { statusWarga: "PENDATANG_KK_LUAR" } }),
+      ]);
 
-    const stats = {
-      totalKepalaKeluarga: households.length,
-      totalLakiLaki: households.reduce((sum, h) => sum + h.totalLakiLaki, 0),
-      totalPerempuan: households.reduce((sum, h) => sum + h.totalPerempuan, 0),
-      totalKendaraan: households.reduce((sum, h) => sum + h.totalKendaraan, 0),
-      totalRumah: households.length,
+    return {
+      success: true,
+      data: {
+        totalRumah,
+        totalWargaAsli,
+        totalPendatangRT55,
+        totalPendatangLuar,
+      },
     };
-
-    return { success: true, data: stats };
   } catch (error) {
     console.error("[v0] Error fetching warga stats:", error);
     return {
       success: false,
       error: "Gagal mengambil statistik warga",
       data: {
-        totalKepalaKeluarga: 0,
-        totalLakiLaki: 0,
-        totalPerempuan: 0,
-        totalKendaraan: 0,
         totalRumah: 0,
+        totalWargaAsli: 0,
+        totalPendatangRT55: 0,
+        totalPendatangLuar: 0,
       },
     };
   }
 }
 
-// Create household (admin only)
 export async function createHousehold(data: z.infer<typeof householdSchema>) {
   try {
     await requireAdmin();
     const validated = householdSchema.parse(data);
-
-    const household = await prisma.household.create({
-      data: validated,
-    });
-
+    const household = await prisma.household.create({ data: validated });
     revalidatePath("/admin/warga");
     revalidatePath("/");
-
     return { success: true, data: household };
   } catch (error) {
     console.error("[v0] Error creating household:", error);
@@ -81,7 +68,6 @@ export async function createHousehold(data: z.infer<typeof householdSchema>) {
   }
 }
 
-// Update household (admin only)
 export async function updateHousehold(
   id: string,
   data: z.infer<typeof householdSchema>,
@@ -90,14 +76,17 @@ export async function updateHousehold(
     await requireAdmin();
     const validated = householdSchema.parse(data);
 
+    const existing = await prisma.household.findUnique({ where: { id } });
+    if (existing?.fotoRumah && existing.fotoRumah !== validated.fotoRumah) {
+      await deletePublicFile(existing.fotoRumah);
+    }
+
     const household = await prisma.household.update({
       where: { id },
       data: validated,
     });
-
     revalidatePath("/admin/warga");
     revalidatePath("/");
-
     return { success: true, data: household };
   } catch (error) {
     console.error("[v0] Error updating household:", error);
@@ -108,21 +97,85 @@ export async function updateHousehold(
   }
 }
 
-// Delete household (admin only)
 export async function deleteHousehold(id: string) {
   try {
     await requireAdmin();
+    const existing = await prisma.household.findUnique({ where: { id } });
+    await deletePublicFile(existing?.fotoRumah);
 
-    const household = await prisma.household.delete({
-      where: { id },
-    });
-
+    const household = await prisma.household.delete({ where: { id } });
     revalidatePath("/admin/warga");
     revalidatePath("/");
-
     return { success: true, data: household };
   } catch (error) {
     console.error("[v0] Error deleting household:", error);
     return { success: false, error: "Gagal menghapus data warga" };
+  }
+}
+
+export async function getHouseholdsPaginated(
+  page: number = 1,
+  limit: number = 15,
+  search: string = "",
+) {
+  try {
+    const skip = (page - 1) * limit;
+
+    const where = search
+      ? {
+          OR: [
+            {
+              kepalaKeluarga: {
+                contains: search,
+                mode: "insensitive",
+              },
+            },
+            {
+              namaPemilikRumah: {
+                contains: search,
+                mode: "insensitive",
+              },
+            },
+            {
+              nomorRumah: {
+                contains: search,
+                mode: "insensitive",
+              },
+            },
+            {
+              noTelepon: {
+                contains: search,
+                mode: "insensitive",
+              },
+            },
+          ],
+        }
+      : {};
+
+    const [households, total] = await Promise.all([
+      prisma.household.findMany({
+        where,
+        orderBy: { createdAt: "desc" },
+        skip,
+        take: limit,
+      }),
+      prisma.household.count({ where }),
+    ]);
+
+    return {
+      success: true,
+      data: households,
+      pagination: {
+        page,
+        totalPages: Math.ceil(total / limit),
+        total,
+      },
+    };
+  } catch (error) {
+    console.error(error);
+    return {
+      success: false,
+      error: "Gagal mengambil data warga",
+    };
   }
 }

@@ -20,6 +20,12 @@ enum TransactionType {
   PENGELUARAN
 }
 
+enum StatusWarga {
+  WARGA_ASLI
+  PENDATANG_KK_RT55
+  PENDATANG_KK_LUAR
+}
+
 model User {
   id        String   @id @default(cuid())
   name      String
@@ -89,15 +95,18 @@ model CashTransaction {
 }
 
 model Household {
-  id                String   @id @default(cuid())
-  kepalaKeluargaNama String   // Nama kepala keluarga
-  nomorRumah        String?  // Nomor rumah / alamat
-  noTelepon         String?  // Nomor telepon
-  totalLakiLaki     Int      @default(0) // Total anggota laki-laki
-  totalPerempuan    Int      @default(0) // Total anggota perempuan
-  totalKendaraan    Int      @default(0) // Total kendaraan
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  id                String       @id @default(cuid())
+  nomorRumah        String?
+  namaPemilikRumah  String?
+  kepalaKeluarga    String
+  jumlahKK          Int          @default(1)
+  statusWarga       StatusWarga  @default(WARGA_ASLI)
+  noTelepon         String?
+  fotoRumah         String?
+  koordinat         String?      // format: "lat,lng"
+  blok              String?
+  createdAt         DateTime     @default(now())
+  updatedAt         DateTime     @updatedAt
 
   @@index([createdAt])
 }

@@ -2,19 +2,16 @@
 
 import { useState, useEffect } from "react";
 import { getHomepage, updateHomepage } from "@/app/actions/homepage";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
-import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import Image from "next/image";
 
 export default function AdminHomepagePage() {
-  const router = useRouter();
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
-  const [uploadProgress, setUploadProgress] = useState(0);
 
   const [formData, setFormData] = useState({
     rtName: "",
@@ -29,28 +26,22 @@ export default function AdminHomepagePage() {
 
   useEffect(() => {
     async function loadData() {
-      try {
-        const result = await getHomepage();
-        if (result.success && result.data) {
-          const hp = result.data.homepage; // ← tambah ini
-          setFormData({
-            rtName: hp?.rtName ?? "",
-            sambutan: hp?.sambutan ?? "",
-            visi: hp?.visi ?? "",
-            misi: hp?.misi ?? "",
-            bannerUrl: hp?.bannerUrl ?? "",
-            heroImageUrl: hp?.heroImageUrl ?? "",
-            ketuaRtName: hp?.ketuaRtName ?? "",
-            ketuaRtPhotoUrl: hp?.ketuaRtPhotoUrl ?? "",
-          });
-        }
-      } catch (err) {
-        console.error("[v0] Error loading homepage:", err);
-      } finally {
-        setIsLoading(false);
+      const result = await getHomepage();
+      if (result.success && result.data) {
+        const hp = result.data.homepage;
+        setFormData({
+          rtName: hp?.rtName ?? "",
+          sambutan: hp?.sambutan ?? "",
+          visi: hp?.visi ?? "",
+          misi: hp?.misi ?? "",
+          bannerUrl: hp?.bannerUrl ?? "",
+          heroImageUrl: hp?.heroImageUrl ?? "",
+          ketuaRtName: hp?.ketuaRtName ?? "",
+          ketuaRtPhotoUrl: hp?.ketuaRtPhotoUrl ?? "",
+        });
       }
+      setIsLoading(false);
     }
-
     loadData();
   }, []);
 
@@ -59,29 +50,14 @@ export default function AdminHomepagePage() {
     fieldName: "bannerUrl" | "heroImageUrl" | "ketuaRtPhotoUrl",
   ) {
     try {
-      setUploadProgress(0);
-      const formDataObj = new FormData();
-      formDataObj.append("file", file);
-      formDataObj.append("category", "homepage");
-
-      console.log("[v0] Uploading file:", file.name, "for field:", fieldName);
-
-      const response = await fetch("/api/upload", {
-        method: "POST",
-        body: formDataObj,
-      });
-
-      if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.error || "Upload failed");
-      }
-
-      const data = await response.json();
-      console.log("[v0] Upload successful:", data.fileUrl);
-      setFormData({ ...formData, [fieldName]: data.fileUrl });
-      setUploadProgress(100);
+      const fd = new FormData();
+      fd.append("file", file);
+      fd.append("category", "homepage");
+      const res = await fetch("/api/upload", { method: "POST", body: fd });
+      if (!res.ok) throw new Error("Upload gagal");
+      const data = await res.json();
+      setFormData((prev) => ({ ...prev, [fieldName]: data.fileUrl }));
     } catch (err) {
-      console.error("[v0] Upload error:", err);
       setError(err instanceof Error ? err.message : "Upload gagal");
     }
   }
@@ -90,176 +66,169 @@ export default function AdminHomepagePage() {
     e.preventDefault();
     setIsSaving(true);
     setError(null);
-    setSuccess(false);
-
-    try {
-      console.log("[v0] Saving homepage");
-      const result = await updateHomepage(formData);
-
-      if (result.success) {
-        setSuccess(true);
-        console.log("[v0] Homepage saved successfully");
-        setTimeout(() => setSuccess(false), 3000);
-      } else {
-        setError(result.error || "Gagal menyimpan");
-      }
-    } catch (err) {
-      console.error("[v0] Error saving:", err);
-      setError("Terjadi kesalahan saat menyimpan");
-    } finally {
-      setIsSaving(false);
+    const result = await updateHomepage(formData);
+    if (result.success) {
+      setSuccess(true);
+      setTimeout(() => setSuccess(false), 3000);
+    } else {
+      setError(result.error || "Gagal menyimpan");
     }
+    setIsSaving(false);
   }
 
-  if (isLoading) {
+  if (isLoading)
     return (
-      <div className="container mx-auto px-4 py-12">
-        <p className="text-center text-muted-foreground">Loading...</p>
-      </div>
+      <div className="text-gray-400 text-sm py-10 text-center">Memuat...</div>
     );
-  }
 
   return (
-    <div className="container mx-auto px-4 py-12">
-      <div className="mb-8">
-        <h1 className="text-4xl font-bold mb-2">Kelola Beranda</h1>
-        <p className="text-muted-foreground">Edit konten beranda website RT</p>
+    <div className="max-w-2xl">
+      <div className="mb-6">
+        <h1 className="text-lg font-semibold text-gray-900">Kelola Beranda</h1>
+        <p className="text-xs text-gray-500 mt-0.5">
+          Edit konten yang tampil di halaman utama
+        </p>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Edit Informasi Beranda</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-6">
-            {error && (
-              <div className="bg-destructive/10 text-destructive px-3 py-2 rounded-md text-sm">
-                {error}
-              </div>
-            )}
-            {success && (
-              <div className="bg-green-950/20 text-green-400 px-3 py-2 rounded-md text-sm">
-                Berhasil disimpan!
-              </div>
-            )}
+      {error && (
+        <div className="mb-4 px-3 py-2 rounded bg-red-50 border border-red-200 text-red-600 text-xs">
+          {error}
+        </div>
+      )}
+      {success && (
+        <div className="mb-4 px-3 py-2 rounded bg-green-50 border border-green-200 text-green-600 text-xs">
+          Berhasil disimpan!
+        </div>
+      )}
 
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Nama RT</label>
-              <Input
-                value={formData.rtName}
-                onChange={(e) =>
-                  setFormData({ ...formData, rtName: e.target.value })
-                }
-                placeholder="Contoh: RT 55"
-                disabled={isSaving}
-              />
-            </div>
+      <form onSubmit={handleSubmit} className="space-y-5">
+        <Field label="Nama RT">
+          <Input
+            value={formData.rtName}
+            onChange={(e) =>
+              setFormData({ ...formData, rtName: e.target.value })
+            }
+            placeholder="RT 55"
+            className="bg-white border-gray-300 text-gray-900"
+            disabled={isSaving}
+          />
+        </Field>
 
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Sambutan</label>
-              <Textarea
-                value={formData.sambutan}
-                onChange={(e) =>
-                  setFormData({ ...formData, sambutan: e.target.value })
-                }
-                placeholder="Sambutan untuk warga..."
-                rows={4}
-                disabled={isSaving}
-              />
-            </div>
+        <Field label="Sambutan">
+          <Textarea
+            value={formData.sambutan}
+            onChange={(e) =>
+              setFormData({ ...formData, sambutan: e.target.value })
+            }
+            rows={3}
+            className="bg-white border-gray-300 text-gray-900 resize-none"
+            disabled={isSaving}
+          />
+        </Field>
 
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Visi</label>
-              <Textarea
-                value={formData.visi}
-                onChange={(e) =>
-                  setFormData({ ...formData, visi: e.target.value })
-                }
-                placeholder="Visi RT..."
-                rows={4}
-                disabled={isSaving}
-              />
-            </div>
+        <Field label="Visi">
+          <Textarea
+            value={formData.visi}
+            onChange={(e) => setFormData({ ...formData, visi: e.target.value })}
+            rows={3}
+            className="bg-white border-gray-300 text-gray-900 resize-none"
+            disabled={isSaving}
+          />
+        </Field>
 
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Misi</label>
-              <Textarea
-                value={formData.misi}
-                onChange={(e) =>
-                  setFormData({ ...formData, misi: e.target.value })
-                }
-                placeholder="Misi RT..."
-                rows={4}
-                disabled={isSaving}
-              />
-            </div>
+        <Field label="Misi">
+          <Textarea
+            value={formData.misi}
+            onChange={(e) => setFormData({ ...formData, misi: e.target.value })}
+            rows={3}
+            className="bg-white border-gray-300 text-gray-900 resize-none"
+            disabled={isSaving}
+          />
+        </Field>
 
-            <div className="space-y-2">
-              <label className="text-sm font-medium">
-                Hero Image (Halaman Utama)
-              </label>
-              <div className="space-y-2">
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) => {
-                    const file = e.currentTarget.files?.[0];
-                    if (file) {
-                      handleUploadFile(file, "heroImageUrl");
-                    }
-                  }}
-                  disabled={isSaving}
-                  className="block w-full text-sm"
-                />
-                {formData.heroImageUrl && (
-                  <div className="text-sm text-muted-foreground">
-                    ✓ Hero image sudah diupload: {formData.heroImageUrl}
-                  </div>
-                )}
-              </div>
-            </div>
+        <div className="border-t border-gray-200 pt-5 grid grid-cols-1 md:grid-cols-2 gap-5">
+          <Field label="Hero Image">
+            <UploadField
+              currentUrl={formData.heroImageUrl}
+              onChange={(file) => handleUploadFile(file, "heroImageUrl")}
+              disabled={isSaving}
+            />
+          </Field>
 
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Nama Ketua RT</label>
-              <Input
-                value={formData.ketuaRtName}
-                onChange={(e) =>
-                  setFormData({ ...formData, ketuaRtName: e.target.value })
-                }
-                placeholder="Nama ketua RT..."
-                disabled={isSaving}
-              />
-            </div>
+          <Field label="Nama Ketua RT">
+            <Input
+              value={formData.ketuaRtName}
+              onChange={(e) =>
+                setFormData({ ...formData, ketuaRtName: e.target.value })
+              }
+              placeholder="Nama ketua RT"
+              className="bg-white border-gray-300 text-gray-900"
+              disabled={isSaving}
+            />
+          </Field>
 
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Foto Ketua RT</label>
-              <div className="space-y-2">
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) => {
-                    const file = e.currentTarget.files?.[0];
-                    if (file) {
-                      handleUploadFile(file, "ketuaRtPhotoUrl");
-                    }
-                  }}
-                  disabled={isSaving}
-                  className="block w-full text-sm"
-                />
-                {formData.ketuaRtPhotoUrl && (
-                  <div className="text-sm text-muted-foreground">
-                    ✓ Foto ketua RT sudah diupload: {formData.ketuaRtPhotoUrl}
-                  </div>
-                )}
-              </div>
-            </div>
+          <Field label="Foto Ketua RT">
+            <UploadField
+              currentUrl={formData.ketuaRtPhotoUrl}
+              onChange={(file) => handleUploadFile(file, "ketuaRtPhotoUrl")}
+              disabled={isSaving}
+            />
+          </Field>
+        </div>
 
-            <Button type="submit" disabled={isSaving} className="w-full">
-              {isSaving ? "Menyimpan..." : "Simpan Perubahan"}
-            </Button>
-          </form>
-        </CardContent>
-      </Card>
+        <Button
+          type="submit"
+          disabled={isSaving}
+          className="w-full bg-blue-600 hover:bg-blue-700"
+        >
+          {isSaving ? "Menyimpan..." : "Simpan Perubahan"}
+        </Button>
+      </form>
+    </div>
+  );
+}
+
+function Field({
+  label,
+  children,
+}: {
+  label: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="space-y-1.5">
+      <label className="text-xs font-medium text-gray-700">{label}</label>
+      {children}
+    </div>
+  );
+}
+
+function UploadField({
+  currentUrl,
+  onChange,
+  disabled,
+}: {
+  currentUrl: string;
+  onChange: (f: File) => void;
+  disabled: boolean;
+}) {
+  return (
+    <div className="space-y-2">
+      {currentUrl && (
+        <div className="relative w-full h-24 rounded overflow-hidden border border-gray-200">
+          <Image src={currentUrl} alt="preview" fill className="object-cover" />
+        </div>
+      )}
+      <input
+        type="file"
+        accept="image/*"
+        onChange={(e) => {
+          const f = e.currentTarget.files?.[0];
+          if (f) onChange(f);
+        }}
+        disabled={disabled}
+        className="block w-full text-xs text-gray-500 file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:bg-gray-100 file:text-gray-700 hover:file:bg-gray-200"
+      />
     </div>
   );
 }

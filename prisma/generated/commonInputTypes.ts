@@ -182,6 +182,13 @@ export type IntFilter<$PrismaModel = never> = {
   not?: Prisma.NestedIntFilter<$PrismaModel> | number
 }
 
+export type EnumStatusWargaFilter<$PrismaModel = never> = {
+  equals?: $Enums.StatusWarga | Prisma.EnumStatusWargaFieldRefInput<$PrismaModel>
+  in?: $Enums.StatusWarga[] | Prisma.ListEnumStatusWargaFieldRefInput<$PrismaModel>
+  notIn?: $Enums.StatusWarga[] | Prisma.ListEnumStatusWargaFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumStatusWargaFilter<$PrismaModel> | $Enums.StatusWarga
+}
+
 export type IntWithAggregatesFilter<$PrismaModel = never> = {
   equals?: number | Prisma.IntFieldRefInput<$PrismaModel>
   in?: number[] | Prisma.ListIntFieldRefInput<$PrismaModel>
@@ -196,6 +203,16 @@ export type IntWithAggregatesFilter<$PrismaModel = never> = {
   _sum?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedIntFilter<$PrismaModel>
   _max?: Prisma.NestedIntFilter<$PrismaModel>
+}
+
+export type EnumStatusWargaWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.StatusWarga | Prisma.EnumStatusWargaFieldRefInput<$PrismaModel>
+  in?: $Enums.StatusWarga[] | Prisma.ListEnumStatusWargaFieldRefInput<$PrismaModel>
+  notIn?: $Enums.StatusWarga[] | Prisma.ListEnumStatusWargaFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumStatusWargaWithAggregatesFilter<$PrismaModel> | $Enums.StatusWarga
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumStatusWargaFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumStatusWargaFilter<$PrismaModel>
 }
 
 export type NestedStringFilter<$PrismaModel = never> = {
@@ -368,6 +385,13 @@ export type NestedDecimalWithAggregatesFilter<$PrismaModel = never> = {
   _max?: Prisma.NestedDecimalFilter<$PrismaModel>
 }
 
+export type NestedEnumStatusWargaFilter<$PrismaModel = never> = {
+  equals?: $Enums.StatusWarga | Prisma.EnumStatusWargaFieldRefInput<$PrismaModel>
+  in?: $Enums.StatusWarga[] | Prisma.ListEnumStatusWargaFieldRefInput<$PrismaModel>
+  notIn?: $Enums.StatusWarga[] | Prisma.ListEnumStatusWargaFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumStatusWargaFilter<$PrismaModel> | $Enums.StatusWarga
+}
+
 export type NestedIntWithAggregatesFilter<$PrismaModel = never> = {
   equals?: number | Prisma.IntFieldRefInput<$PrismaModel>
   in?: number[] | Prisma.ListIntFieldRefInput<$PrismaModel>
@@ -393,6 +417,16 @@ export type NestedFloatFilter<$PrismaModel = never> = {
   gt?: number | Prisma.FloatFieldRefInput<$PrismaModel>
   gte?: number | Prisma.FloatFieldRefInput<$PrismaModel>
   not?: Prisma.NestedFloatFilter<$PrismaModel> | number
+}
+
+export type NestedEnumStatusWargaWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.StatusWarga | Prisma.EnumStatusWargaFieldRefInput<$PrismaModel>
+  in?: $Enums.StatusWarga[] | Prisma.ListEnumStatusWargaFieldRefInput<$PrismaModel>
+  notIn?: $Enums.StatusWarga[] | Prisma.ListEnumStatusWargaFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumStatusWargaWithAggregatesFilter<$PrismaModel> | $Enums.StatusWarga
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumStatusWargaFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumStatusWargaFilter<$PrismaModel>
 }
 
 

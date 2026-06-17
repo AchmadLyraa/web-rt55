@@ -964,12 +964,15 @@ export type CashTransactionScalarFieldEnum = (typeof CashTransactionScalarFieldE
 
 export const HouseholdScalarFieldEnum = {
   id: 'id',
-  kepalaKeluargaNama: 'kepalaKeluargaNama',
   nomorRumah: 'nomorRumah',
+  namaPemilikRumah: 'namaPemilikRumah',
+  kepalaKeluarga: 'kepalaKeluarga',
+  jumlahKK: 'jumlahKK',
+  statusWarga: 'statusWarga',
   noTelepon: 'noTelepon',
-  totalLakiLaki: 'totalLakiLaki',
-  totalPerempuan: 'totalPerempuan',
-  totalKendaraan: 'totalKendaraan',
+  fotoRumah: 'fotoRumah',
+  koordinat: 'koordinat',
+  blok: 'blok',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -1088,6 +1091,20 @@ export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'In
  * Reference to a field of type 'Int[]'
  */
 export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int[]'>
+    
+
+
+/**
+ * Reference to a field of type 'StatusWarga'
+ */
+export type EnumStatusWargaFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'StatusWarga'>
+    
+
+
+/**
+ * Reference to a field of type 'StatusWarga[]'
+ */
+export type ListEnumStatusWargaFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'StatusWarga[]'>
     
 
 
